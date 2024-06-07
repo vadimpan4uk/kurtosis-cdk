@@ -3,7 +3,7 @@
 # The deployment process is divided into various stages.
 
 # Deploy local L1.
-deploy_l1: true
+deploy_l1: false
 
 # Deploy zkevm contracts on L1 (and also fund accounts).
 deploy_zkevm_contracts_on_l1: true
@@ -42,13 +42,13 @@ args:
   # - 'rollup': Transaction data is stored on-chain on L1.
   # - 'cdk-validium': Transaction data is stored off-chain using the CDK DA layer and a DAC.
   # In the future, we would like to support external DA protocols such as Avail, Celestia and Near.
-  data_availability_mode: cdk-validium
+  data_availability_mode: rollup
 
   # Docker images and repositories used to spin up services.
   zkevm_prover_image: hermeznetwork/zkevm-prover:v6.0.0
   # zkevm_prover_image: hermeznetwork/zkevm-prover:v4.0.19
 
-  zkevm_node_image: hermeznetwork/zkevm-node:v0.6.5
+  zkevm_node_image: zkevm-node
   cdk_node_image: 0xpolygon/cdk-validium-node:0.6.5-cdk
   # cdk_node_image: 0xpolygon/cdk-validium-node:0.5.13-cdk.3
 
@@ -114,11 +114,11 @@ args:
   zkevm_l2_keystore_password: pSnv6Dh5s9ahuzGzH9RoCDrKAMddaX3m
 
   ## L1 configuration.
-  l1_chain_id: 271828
-  l1_preallocated_mnemonic: code code code code code code code code code code code quality
-  l1_funding_amount: 100ether
-  l1_rpc_url: http://el-1-geth-lighthouse:8545
-  l1_ws_url: ws://el-1-geth-lighthouse:8546
+  l1_chain_id: 11155111
+  l1_preallocated_mnemonic: unable surround banana canvas slot valid pizza main dismiss fence then path
+  l1_funding_amount: 0.001ether
+  l1_rpc_url: https://ethereum-sepolia-rpc.publicnode.com
+  l1_ws_url: wss://ethereum-sepolia-rpc.publicnode.com
   # https://github.com/kurtosis-tech/ethereum-package/tree/main?tab=readme-ov-file#configuration
   l1_additional_services: [
     # blockscout, # block explorer
