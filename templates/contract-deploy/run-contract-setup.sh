@@ -82,7 +82,7 @@ echo_ts "Step 1: Preparing tesnet"
 npx hardhat run deployment/testnet/prepareTestnet.ts --network localhost | tee 01_prepare_testnet.out
 
 echo_ts "Step 2: Creating genesis"
-MNEMONIC="{{.l1_preallocated_mnemonic}}" npx ts-node deployment/v2/1_createGenesis.ts | tee 02_create_genesis.out
+MNEMONIC="{{.l1_preallocated_mnemonic}}" npx ts-node deployment/v2/1_createGenesis.ts --predefined='[{"isContract": true,"name": "USDT","balance": "1000000000","address": "0x1CDD2EaB61112697626F7b4bB0e23Da4FeBF7B7C"},{"isContract": false,"name": "some deployer","balance": "1000000000","address": "0xAb40228A9D8659103De421Fd77dBE192cF0e948f"}]' | tee 02_create_genesis.out
 
 echo_ts "Step 3: Deploying PolygonZKEVMDeployer"
 npx hardhat run deployment/v2/2_deployPolygonZKEVMDeployer.ts --network localhost | tee 03_zkevm_deployer.out
