@@ -21,6 +21,10 @@ ARTIFACTS = [
         "name": "1_createGenesis.ts",
         "file": "./templates/contract-deploy/1_createGenesis.ts",
     },
+    {
+        "name": "3_deployContracts.ts",
+        "file": "./templates/contract-deploy/3_deployContracts.ts",
+    },
 ]
 
 
