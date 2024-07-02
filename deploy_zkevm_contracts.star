@@ -18,7 +18,7 @@ ARTIFACTS = [
         "file": "./templates/contract-deploy/create-keystores.sh",
     },
     {
-        "name": "create-keystores.sh",
+        "name": "1_createGenesis.ts",
         "file": "./templates/contract-deploy/1_createGenesis.ts",
     },
 ]
