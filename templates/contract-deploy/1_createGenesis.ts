@@ -21,7 +21,7 @@ import yargs from "yargs/yargs";
         "isContract": false,
         "name": "some deployer",
         "balance": "1000000000",
-        "address": "0xAb40228A9D8659103De421Fd77dBE192cF0e948f"
+        "address": "0x02d655B0396e40dA9fD80C0528f9C3fb488895Df"
     }
 ]
  */
