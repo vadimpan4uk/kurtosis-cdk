@@ -139,7 +139,7 @@ async function main() {
     ) as PolygonRollupManager;
 
     const DEFAULT_ADMIN_ROLE = ethers.ZeroHash;
-    console.log('rollupManagerContract', rollupManagerContract.address, deployer.address);
+    console.log('rollupManagerContract', deployOutput.polygonRollupManagerAddress, deployer.address);
     if ((await rollupManagerContract.hasRole(DEFAULT_ADMIN_ROLE, deployer.address)) == false) {
         throw new Error(
             `Deployer does not have admin role. Use the test flag on deploy_parameters if this is a test deployment`
