@@ -2,7 +2,7 @@ data_availability_package = import_module("./lib/data_availability.star")
 
 ARTIFACTS = [
     {
-        "name": "deploy_parameters",
+        "name": "deploy_parameters.json",
         "file": "./templates/contract-deploy/deploy_parameters.json",
     },
     {
