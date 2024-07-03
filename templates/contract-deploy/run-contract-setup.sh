@@ -78,6 +78,8 @@ jq --slurpfile c gasToken-erc20.json '.gasTokenAddress = $c[0].deployedTo' /opt/
 # Deploy contracts.
 echo_ts "Deploying zkevm contracts to L1"
 
+cp /opt/contract-deploy/helpers/deployment-helpers.ts deployment/helpers/deployment-helpers.ts
+
 echo_ts "Step 1: Preparing tesnet"
 npx hardhat run deployment/testnet/prepareTestnet.ts --network localhost | tee 01_prepare_testnet.out
 

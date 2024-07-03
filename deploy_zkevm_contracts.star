@@ -25,6 +25,10 @@ ARTIFACTS = [
         "name": "3_deployContracts.ts",
         "file": "./templates/contract-deploy/3_deployContracts.ts",
     },
+    {
+        "name": "deployment-helpers.ts",
+        "file": "./templates/contract-deploy/helpers/deployment-helpers.ts",
+    },
 ]
 
 
