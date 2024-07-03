@@ -57,8 +57,8 @@ cp /opt/zkevm-contracts/deployment/v2/genesis.json /opt/zkevm/
 cp /opt/zkevm-contracts/deployment/v2/create_rollup_output.json /opt/zkevm/
 cp /opt/zkevm-contracts/deployment/v2/create_rollup_parameters.json /opt/zkevm/
 cp /opt/zkevm-contracts/deployment/v2/combined.json /opt/zkevm/
+cp /opt/zkevm-contracts/deployment/v2/combined.json /opt/
 popd
-
 
 echo "Transformation complete. Output written to dynamic-kurtosis-allocs.json"
 
