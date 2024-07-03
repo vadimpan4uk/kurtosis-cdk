@@ -60,6 +60,8 @@ cp /opt/zkevm-contracts/deployment/v2/combined.json /opt/zkevm/
 cp /opt/zkevm-contracts/deployment/v2/combined.json /opt/
 popd
 
+cd zkevm
+
 echo "Transformation complete. Output written to dynamic-kurtosis-allocs.json"
 
 jq '{"root": .root, "timestamp": 0, "gasLimit": 0, "difficulty": 0}' /opt/zkevm/genesis.json > dynamic-kurtosis-conf.json
