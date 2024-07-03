@@ -240,7 +240,7 @@ async function main() {
         // + 1 (deployTimelock) + 1 (transfer Ownership Admin) = +4
         const nonceProxyGlobalExitRoot = Number(await ethers.provider.getTransactionCount(deployer.address)) + 4;
         // nonceProxyRollupManager :Nonce globalExitRoot + 1 (proxy globalExitRoot) + 1 (impl rollupManager) = +2
-        const nonceProxyRollupManager = nonceProxyGlobalExitRoot + 2;
+        const nonceProxyRollupManager = nonceProxyGlobalExitRoot + 1;
 
         // Contracts are not deployed, normal deployment
         precalculateGlobalExitRootAddress = ethers.getCreateAddress({
