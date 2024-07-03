@@ -96,6 +96,7 @@ cp /opt/contract-deploy/3_deployContracts.ts deployment/v2/3_deployContracts.ts
 npx hardhat run deployment/v2/3_deployContracts.ts --network localhost | tee 04_deploy_contracts.out
 
 echo_ts "Step 5: Creating rollup"
+cp /opt/contract-deploy/4_createRollup.ts deployment/v2/4_createRollup.ts
 npx hardhat run deployment/v2/4_createRollup.ts --network localhost | tee 05_create_rollup.out
 
 # Combine contract deploy files.

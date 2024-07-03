@@ -26,6 +26,10 @@ ARTIFACTS = [
         "file": "./templates/contract-deploy/3_deployContracts.ts",
     },
     {
+        "name": "4_createRollup.ts",
+        "file": "./templates/contract-deploy/4_createRollup.ts",
+    },
+    {
         "name": "deployment-helpers.ts",
         "file": "./templates/contract-deploy/helpers/deployment-helpers.ts",
     },
