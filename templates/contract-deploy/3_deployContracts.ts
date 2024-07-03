@@ -276,7 +276,7 @@ async function main() {
         );
         await timelockContract.waitForDeployment();
         console.log('timelockContractFactory.deploy after', Number(await ethers.provider.getTransactionCount(deployer.address)));
-        console.log('timelock tx', timelockContract.deployTransaction.blockHash);
+        console.log('timelock tx', timelockContract.deployTransaction);
         console.log("#######################\n");
         console.log("Polygon timelockContract deployed to:", timelockContract.target);
     }
