@@ -19,6 +19,8 @@ import "../helpers/utils";
 
 const pathOutputJson = path.join(__dirname, "./create_rollup_output.json");
 
+const deployParameters = require("./deploy_parameters.json");
+
 import {
     PolygonRollupManager,
     PolygonZkEVMV2,
@@ -139,8 +141,6 @@ async function main() {
     ) as PolygonRollupManager;
 
     const DEFAULT_ADMIN_ROLE = ethers.ZeroHash;
-    console.log('rollupManagerContract', deployOutput.polygonRollupManagerAddress, deployer.address);
-    console.log('aaa', await rollupManagerContract.owner());
     if ((await rollupManagerContract.hasRole(DEFAULT_ADMIN_ROLE, deployer.address)) == false) {
         throw new Error(
             `Deployer does not have admin role. Use the test flag on deploy_parameters if this is a test deployment`
