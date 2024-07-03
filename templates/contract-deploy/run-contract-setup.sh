@@ -90,7 +90,7 @@ echo_ts "Step 3: Deploying PolygonZKEVMDeployer"
 npx hardhat run deployment/v2/2_deployPolygonZKEVMDeployer.ts --network localhost | tee 03_zkevm_deployer.out
 
 echo_ts "Step 4: Deploying contracts"
-# cp /opt/contract-deploy/3_deployContracts.ts deployment/v2/3_deployContracts.ts
+cp /opt/contract-deploy/3_deployContracts.ts deployment/v2/3_deployContracts.ts
 npx hardhat run deployment/v2/3_deployContracts.ts --network localhost | tee 04_deploy_contracts.out
 
 echo_ts "Step 5: Creating rollup"
