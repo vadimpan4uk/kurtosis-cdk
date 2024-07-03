@@ -43,6 +43,7 @@ sed -i 's#http://127.0.0.1:8545#{{.l1_rpc_url}}#' hardhat.config.ts
 cp /opt/contract-deploy/genesis.json /opt/zkevm-contracts/deployment/v2/genesis.json
 cp /opt/contract-deploy/deploy_*.json /opt/zkevm-contracts/deployment/v2/
 cp /opt/contract-deploy/create_rollup_output.json /opt/zkevm-contracts/deployment/v2/create_rollup_output.json
+cp /opt/contract-deploy/create_rollup_output.json /opt/zkevm-contracts/deployment/v2/create_rollup_output.json
 cp /opt/contract-deploy/create_rollup_parameters.json /opt/zkevm-contracts/deployment/v2/create_rollup_output.json
 
 # Combine contract deploy files.
@@ -59,6 +60,7 @@ popd
 # Combine contract deploy data.
 pushd /opt/zkevm/ || exit 1
 echo_ts "Creating combined.json"
+pwd 
 cp genesis.json genesis.original.json
 jq --slurpfile rollup create_rollup_output.json '. + $rollup[0]' deploy_output.json > combined.json
 
