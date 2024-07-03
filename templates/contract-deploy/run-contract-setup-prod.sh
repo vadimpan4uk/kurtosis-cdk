@@ -45,6 +45,7 @@ cp /opt/contract-deploy/deploy_*.json /opt/zkevm-contracts/deployment/v2/
 cp /opt/contract-deploy/create_rollup_output.json /opt/zkevm-contracts/deployment/v2/create_rollup_output.json
 cp /opt/contract-deploy/create_rollup_output.json /opt/zkevm-contracts/deployment/v2/create_rollup_output.json
 cp /opt/contract-deploy/create_rollup_parameters.json /opt/zkevm-contracts/deployment/v2/create_rollup_output.json
+cp /opt/contract-deploy/combined.json /opt/zkevm-contracts/deployment/v2/combined.json
 
 # Combine contract deploy files.
 # At this point, all of the contracts /should/ have been deployed.
