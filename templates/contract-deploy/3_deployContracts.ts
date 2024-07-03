@@ -168,6 +168,7 @@ async function main() {
     );
     const deployTransactionAdmin = (await proxyAdminFactory.getDeployTransaction()).data;
     const dataCallAdmin = proxyAdminFactory.interface.encodeFunctionData("transferOwnership", [deployer.address]);
+    console.log('create2Deployment proxyAdminAddress', Number(await ethers.provider.getTransactionCount(deployer.address)));
     const [proxyAdminAddress, isProxyAdminDeployed] = await create2Deployment(
         zkEVMDeployerContract,
         salt,
@@ -175,6 +176,7 @@ async function main() {
         dataCallAdmin,
         deployer
     );
+    console.log('create2Deployment proxyAdminAddress after', Number(await ethers.provider.getTransactionCount(deployer.address)));
 
     if (isProxyAdminDeployed) {
         console.log("#######################\n");
@@ -198,6 +200,7 @@ async function main() {
     const dataCallNull = null;
     // Mandatory to override the gasLimit since the estimation with create are mess up D:
     const overrideGasLimit = 5500000n;
+    console.log('create2Deployment bridgeImplementationAddress', Number(await ethers.provider.getTransactionCount(deployer.address)));
     const [bridgeImplementationAddress, isBridgeImplDeployed] = await create2Deployment(
         zkEVMDeployerContract,
         salt,
@@ -206,6 +209,7 @@ async function main() {
         deployer,
         overrideGasLimit
     );
+    console.log('create2Deployment bridgeImplementationAddress after', Number(await ethers.provider.getTransactionCount(deployer.address)));
 
     if (isBridgeImplDeployed) {
         console.log("#######################\n");
@@ -239,8 +243,9 @@ async function main() {
         // Nonce globalExitRoot: currentNonce + 1 (deploy bridge proxy) + 1(impl globalExitRoot)
         // + 1 (deployTimelock) + 1 (transfer Ownership Admin) = +4
         const nonceProxyGlobalExitRoot = Number(await ethers.provider.getTransactionCount(deployer.address)) + 4;
+        console.log('Number(await ethers.provider.getTransactionCount(deployer.address)) 1', Number(await ethers.provider.getTransactionCount(deployer.address)));
         // nonceProxyRollupManager :Nonce globalExitRoot + 1 (proxy globalExitRoot) + 1 (impl rollupManager) = +2
-        const nonceProxyRollupManager = nonceProxyGlobalExitRoot + 1;
+        const nonceProxyRollupManager = nonceProxyGlobalExitRoot + 2; // +3?
 
         // Contracts are not deployed, normal deployment
         precalculateGlobalExitRootAddress = ethers.getCreateAddress({
@@ -248,6 +253,7 @@ async function main() {
             nonce: nonceProxyGlobalExitRoot,
         });
         precalculateRollupManager = ethers.getCreateAddress({from: deployer.address, nonce: nonceProxyRollupManager});
+        console.log('precalculateRollupManager', precalculateRollupManager, 'expected nonce', nonceProxyRollupManager);
         for(let jk = 0; jk < 10; jk++) {
             const tmpPrecalculateRollupManager = ethers.getCreateAddress({from: deployer.address, nonce: nonceProxyGlobalExitRoot + jk});
             console.log('------------ tmpPrecalculateRollupManager', tmpPrecalculateRollupManager, jk);
@@ -260,6 +266,7 @@ async function main() {
         console.log("minDelayTimelock:", minDelayTimelock);
         console.log("timelockAdminAddress:", timelockAdminAddress);
         console.log("Rollup Manager:", precalculateRollupManager);
+        console.log('timelockContractFactory.deploy', Number(await ethers.provider.getTransactionCount(deployer.address)));
         timelockContract = await timelockContractFactory.deploy(
             minDelayTimelock,
             [timelockAdminAddress],
@@ -268,11 +275,16 @@ async function main() {
             precalculateRollupManager
         );
         await timelockContract.waitForDeployment();
+        console.log('timelockContractFactory.deploy after', Number(await ethers.provider.getTransactionCount(deployer.address)));
+        console.log('timelock tx', timelockContract.deployTransaction.blockHash);
         console.log("#######################\n");
         console.log("Polygon timelockContract deployed to:", timelockContract.target);
     }
     // Transfer ownership of the proxyAdmin to timelock
-    await (await proxyAdminInstance.transferOwnership(timelockContract.target)).wait();
+    const txTranseferOwnership = await proxyAdminInstance.transferOwnership(timelockContract.target);
+    await txTranseferOwnership.wait();
+    console.log('txTranseferOwnership', txTranseferOwnership)
+    
 
     console.log("\n#######################");
     console.log("#####  Checks TimelockContract  #####");
@@ -306,6 +318,7 @@ async function main() {
         gasTokenMetadata,
     ]);
 
+    console.log('create2Deployment proxyBridgeAddress', Number(await ethers.provider.getTransactionCount(deployer.address)));
     const [proxyBridgeAddress, isBridgeProxyDeployed] = await create2Deployment(
         zkEVMDeployerContract,
         salt,
@@ -313,6 +326,7 @@ async function main() {
         dataCallProxy,
         deployer
     );
+    console.log('create2Deployment proxyBridgeAddress after', Number(await ethers.provider.getTransactionCount(deployer.address)));
     const polygonZkEVMBridgeContract = polygonZkEVMBridgeFactory.attach(proxyBridgeAddress) as PolygonZkEVMBridgeV2;
 
     if (isBridgeProxyDeployed) {
@@ -419,6 +433,7 @@ async function main() {
     if (!ongoingDeployment.polygonRollupManagerContract) {
         for (let i = 0; i < attemptsDeployProxy; i++) {
             try {
+                console.log('polygonRollupManagerContract before', Number(await ethers.provider.getTransactionCount(deployer.address)), i);
                 polygonRollupManagerContract = await upgrades.deployProxy(
                     PolygonRollupManagerFactory,
                     [
@@ -443,6 +458,7 @@ async function main() {
                         unsafeAllow: ["constructor", "state-variable-immutable"],
                     }
                 );
+                console.log('polygonRollupManagerContract before after', Number(await ethers.provider.getTransactionCount(deployer.address)), i);
 
                 break;
             } catch (error: any) {
