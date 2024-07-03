@@ -64,6 +64,8 @@ cd zkevm
 
 echo "Transformation complete. Output written to dynamic-kurtosis-allocs.json"
 
+cp  /opt/zkevm/genesis.json dynamic-kurtosis-allocs.json
+
 jq '{"root": .root, "timestamp": 0, "gasLimit": 0, "difficulty": 0}' /opt/zkevm/genesis.json > dynamic-kurtosis-conf.json
 
 batch_timestamp=$(jq '.firstBatchData.timestamp' combined.json)
