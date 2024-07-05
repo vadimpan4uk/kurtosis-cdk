@@ -54,3 +54,4 @@ PrivateKey = {Path = "/etc/zkevm/claimtxmanager.keystore", Password = "{{.zkevm_
 Enabled = true
 RetryInterval = "1s"
 RetryNumber = 10
+AuthorizedClaimMessageAddresses = ["0x5C311893e6946b0b1C51BBAa2911Ac59f876d282", "0x755282884b1c8f5CA52b50E006bA37F925BD4677"]
