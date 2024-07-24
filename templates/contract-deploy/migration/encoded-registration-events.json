@@ -1,0 +1,19 @@
+{
+  "userEventFiles": [
+    "script/data/prod/migration/encoded-registration-events-1.json",
+    "script/data/prod/migration/encoded-registration-events-2.json",
+    "script/data/prod/migration/encoded-registration-events-3.json",
+    "script/data/prod/migration/encoded-registration-events-4.json",
+    "script/data/prod/migration/encoded-registration-events-5.json",
+    "script/data/prod/migration/encoded-registration-events-6.json",
+    "script/data/prod/migration/encoded-registration-events-7.json",
+    "script/data/prod/migration/encoded-registration-events-8.json",
+    "script/data/prod/migration/encoded-registration-events-9.json"
+  ],
+  "rootEvent": {
+    "name": "crowdfund",
+    "parent": "0x0000000000000000000000000000000000000000",
+    "user": "0x9b4c3e7fc45e3bd3c4a561c8c6149d4fe695eb32",
+    "timestamp": 1610193528
+  }
+}
