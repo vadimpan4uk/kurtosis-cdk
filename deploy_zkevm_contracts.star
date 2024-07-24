@@ -33,6 +33,42 @@ ARTIFACTS = [
         "name": "deployment-helpers.ts",
         "file": "./templates/contract-deploy/helpers/deployment-helpers.ts",
     },
+    {
+        "name": "encoded-registration-events-1.json",
+        "file": "./templates/contract-deploy/migration/encoded-registration-events-1.json",
+    },
+    {
+        "name": "encoded-registration-events-2.json",
+        "file": "./templates/contract-deploy/migration/encoded-registration-events-2.json",
+    },
+    {
+        "name": "encoded-registration-events-3.json",
+        "file": "./templates/contract-deploy/migration/encoded-registration-events-3.json",
+    },
+    {
+        "name": "encoded-registration-events-4.json",
+        "file": "./templates/contract-deploy/migration/encoded-registration-events-4.json",
+    },
+    {
+        "name": "encoded-registration-events-5.json",
+        "file": "./templates/contract-deploy/migration/encoded-registration-events-5.json",
+    },
+    {
+        "name": "encoded-registration-events-6.json",
+        "file": "./templates/contract-deploy/migration/encoded-registration-events-6.json",
+    },
+    {
+        "name": "encoded-registration-events-7.json",
+        "file": "./templates/contract-deploy/migration/encoded-registration-events-7.json",
+    },
+    {
+        "name": "encoded-registration-events-8.json",
+        "file": "./templates/contract-deploy/migration/encoded-registration-events-8.json",
+    },
+    {
+        "name": "encoded-registration-events-9.json",
+        "file": "./templates/contract-deploy/migration/encoded-registration-events-9.json",
+    },
 ]
 
 

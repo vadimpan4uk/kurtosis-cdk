@@ -86,7 +86,7 @@ npx hardhat run deployment/testnet/prepareTestnet.ts --network localhost | tee 0
 echo_ts "Step 2: Creating genesis"
 cp /opt/contract-deploy/1_createGenesis.ts deployment/v2/1_createGenesis.ts
 echo_ts "Step 2: Creating genesis(replaced file)"
-MNEMONIC="{{.l1_preallocated_mnemonic}}" npx ts-node deployment/v2/1_createGenesis.ts --predefined='[{"isContract": false,"name": "admin","balance": "100000000000000000000000","address": "0x02d655B0396e40dA9fD80C0528f9C3fb488895Df"}]' | tee 02_create_genesis.out
+MNEMONIC="{{.l1_preallocated_mnemonic}}" npx ts-node deployment/v2/1_createGenesis.ts --predefined='[{"isContract": false,"name": "admin","balance": "100000000000000000000000","address": "0x02d655B0396e40dA9fD80C0528f9C3fb488895Df"},{"isContract": true,"name": "GENEALOGY","balance": "100000000000000000000000","address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"}]' | tee 02_create_genesis.out
 
 echo_ts "Step 3: Deploying PolygonZKEVMDeployer"
 npx hardhat run deployment/v2/2_deployPolygonZKEVMDeployer.ts --network localhost | tee 03_zkevm_deployer.out

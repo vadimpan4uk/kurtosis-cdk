@@ -40,7 +40,6 @@ const argv = yargs(process.argv.slice(2))
 const DEFAULT_MNEMONIC = "unable surround banana canvas slot valid pizza main dismiss fence then path";
 process.env.HARDHAT_NETWORK = "hardhat";
 process.env.MNEMONIC = argv.test ? DEFAULT_MNEMONIC : process.env.MNEMONIC;
-console.log("argv", argv);
 import {ethers, upgrades} from "hardhat";
 import {MemDB, ZkEVMDB, getPoseidon, smtUtils} from "@0xpolygonhermez/zkevm-commonjs";
 
@@ -493,6 +492,17 @@ async function main() {
         defaultChainId
     );
 
+    const rootOutputJson = path.join(__dirname, './root.json');
+    fs.writeFileSync(
+        rootOutputJson,
+        JSON.stringify(
+            {
+                root: smtUtils.h4toString(zkEVMDB.stateRoot),
+            },
+            null,
+            1
+        )
+    );
     fs.writeFileSync(
         pathOutputJson,
         JSON.stringify(
@@ -531,6 +541,133 @@ async function getAddressInfo(address: string | Addressable) {
         storage[_ADMIN_SLOT] = valueAdminSlot;
     }
     const valuImplementationSlot = await ethers.provider.getStorage(address, _IMPLEMENTATION_SLOT);
+    if (valuImplementationSlot !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+        storage[_IMPLEMENTATION_SLOT] = valuImplementationSlot;
+    }
+
+    return {nonce, bytecode, storage};
+}
+
+
+/**
+| Name           | Type                                    | Slot | Offset | Bytes | Value                                             | Hex Value                                                          | Contract                    |
+|----------------|-----------------------------------------|------|--------|-------|---------------------------------------------------|--------------------------------------------------------------------|-----------------------------|
+| owner          | address                                 | 0    | 0      | 20    | 1390849295786071768276380950238675083608645509734 | 0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266 | src/Genealogy.sol:Genealogy |
+| authority      | contract Authority                      | 1    | 0      | 20    | 36939424397330556992472503362256006315527366703   | 0x00000000000000000000000006786bcbc114bbfa670e30a1ac35dfd1310be82f | src/Genealogy.sol:Genealogy |
+| genealogy      | mapping(uint256 => struct NodeLib.Node) | 2    | 0      | 32    | 0                                                 | 0x0000000000000000000000000000000000000000000000000000000000000000 | src/Genealogy.sol:Genealogy |
+| nodeIdOf       | mapping(address => uint256)             | 3    | 0      | 32    | 0                                                 | 0x0000000000000000000000000000000000000000000000000000000000000000 | src/Genealogy.sol:Genealogy |
+| nameRegistered | mapping(bytes32 => bool)                | 4    | 0      | 32    | 0                                                 | 0x0000000000000000000000000000000000000000000000000000000000000000 | src/Genealogy.sol:Genealogy |
+| currentNodeId  | uint256                                 | 5    | 0      | 32    | 250250                                            | 0x000000000000000000000000000000000000000000000000000000000003d18a | src/Genealogy.sol:Genealogy |
+ */
+async function getAddressInfoRpc(address: string | Addressable) {
+    const url = 'http://172.31.45.162:8545';
+    const provider = ethers.getDefaultProvider(url);
+    const nonce = await provider.getTransactionCount(address);
+    const bytecode = await provider.getCode(address);
+
+    const storage = {} as {
+        [key: string]: number | string;
+    };
+
+    const r = { 
+         "rootEvent": {
+             "name": "crowdfund",
+             "parent": "0x0000000000000000000000000000000000000000",
+             "user": "0x9b4c3e7fc45e3bd3c4a561c8c6149d4fe695eb32",
+             "timestamp": 1610193528
+         }
+    }
+
+    const dataFiles = [
+        '/opt/contract-deploy/encoded-registration-events-1.json', 
+        '/opt/contract-deploy/encoded-registration-events-2.json',
+        '/opt/contract-deploy/encoded-registration-events-3.json',
+        '/opt/contract-deploy/encoded-registration-events-4.json', 
+        '/opt/contract-deploy/encoded-registration-events-5.json',
+        '/opt/contract-deploy/encoded-registration-events-6.json',
+        '/opt/contract-deploy/encoded-registration-events-7.json', 
+        '/opt/contract-deploy/encoded-registration-events-8.json',
+        '/opt/contract-deploy/encoded-registration-events-9.json',
+    ];
+    const data = dataFiles.reduce((acc, file) => [...acc, ...JSON.parse(fs.readFileSync(file)).userEvents], []);
+    
+    const coder = ethers.AbiCoder.defaultAbiCoder();
+
+    const outFilename = path.join(__dirname, './storage.txt');
+    for (let i = 0; i < 200; i++) {
+        const storageValue = await ethers.provider.getStorage(address, i);
+        if (storageValue !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+            storage[ethers.toBeHex(i, 32)] = storageValue;
+        } else if (i === 2) {
+            const storagePositionRoot = ethers.solidityPackedKeccak256(
+                ["uint256", "uint256"],
+                [r.rootEvent.user, 3]
+            );
+            const nodeIdRootValue = await provider.getStorage(address, storagePositionRoot);
+            storage[storagePositionRoot] = nodeIdRootValue;
+
+            // mapping(uint256 => NodeLib.Node) internal genealogy;
+            const storagePositionGenealogyRoot = ethers.solidityPackedKeccak256(
+                ["uint256", "uint256"],
+                [nodeIdRootValue, 2]
+            );
+            const genealogyRootValue = await provider.getStorage(address, storagePositionGenealogyRoot);
+            storage[storagePositionGenealogyRoot] = genealogyRootValue;
+
+            for(let i = 0; i < data.length; i++) {
+                if (i % 1000) {
+                    console.log(' process 2&3', i, 'from ', data.length);
+                }
+                const storagePosition = ethers.solidityPackedKeccak256(
+                    ["uint256", "uint256"],
+                    [data[i].user, 3]
+                );  
+                const value = await provider.getStorage(address, storagePosition);
+                storage[storagePosition] = value;
+                fs.writeFileSync(
+                    outFilename, `${storagePosition} ${value}\n`, {flag: 'a'}
+                );
+                
+                const storagePositionGenealogy = ethers.solidityPackedKeccak256(
+                    ["uint256", "uint256"],
+                    [value, 2]
+                );
+                const genealogyValue = await provider.getStorage(address, storagePositionGenealogy);
+                storage[storagePositionGenealogy] = genealogyValue;
+                fs.writeFileSync(
+                    outFilename, `${storagePositionGenealogy} ${genealogyValue}\n`, {flag: 'a'}
+                );
+            }  
+        } else if (i === 4) {
+            const storagePositionRoot = ethers.solidityPackedKeccak256(
+                ["uint256", "uint256"],
+                [ethers.keccak256(coder.encode(['string'], [r.rootEvent.name])), 2]
+            );
+            const nameRootValue = await provider.getStorage(address, storagePositionRoot);
+            storage[storagePositionRoot] = nameRootValue;
+            for(let i = 0; i < data.length; i++) {
+                if (i % 1000) {
+                    console.log(' process 4', i, 'from ', data.length);
+                }
+                const storagePosition = ethers.solidityPackedKeccak256(
+                    ["uint256", "uint256"],
+                    [ethers.keccak256(coder.encode(['string'], [data[i].name])), 2]
+                );  
+                const value = await provider.getStorage(address, storagePosition);
+                storage[storagePosition] = value;
+                fs.writeFileSync(
+                    outFilename, `${storagePosition} ${value}\n`, {flag: 'a'}
+                );
+            }
+        }
+    }
+
+    // doesn't exist 
+    const valueAdminSlot = await provider.getStorage(address, _ADMIN_SLOT);
+    if (valueAdminSlot !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+        storage[_ADMIN_SLOT] = valueAdminSlot;
+    }
+    const valuImplementationSlot = await provider.getStorage(address, _IMPLEMENTATION_SLOT);
     if (valuImplementationSlot !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
         storage[_IMPLEMENTATION_SLOT] = valuImplementationSlot;
     }
