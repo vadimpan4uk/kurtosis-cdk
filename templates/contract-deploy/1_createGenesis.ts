@@ -625,6 +625,13 @@ async function getAddressInfo(address: string | Addressable) {
     return {nonce, bytecode, storage};
 }
 
+async function getStorage(address: string, key: string): Promise<void> {
+    const url = 'http://172.31.45.162:8545';
+    const provider = ethers.getDefaultProvider(url);
+    const info = await provider.getStorage(address, key);
+    console.log('---------- info', address, key, info);
+}
+
 async function getAddressInfoLocal(address: string | Addressable) {
     const url = 'http://172.31.45.162:8545';
     const provider = ethers.getDefaultProvider(url);
