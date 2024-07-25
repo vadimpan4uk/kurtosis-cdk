@@ -7,19 +7,13 @@ import fs = require("fs");
 import * as dotenv from "dotenv";
 dotenv.config({path: path.resolve(__dirname, "../../.env")});
 import {ethers, upgrades} from "hardhat";
-import {HardhatEthersSigner} from "@nomicfoundation/hardhat-ethers/signers";
-const {create2Deployment} = require("../helpers/deployment-helpers");
-
-const pathGenesis = path.join(__dirname, "./genesis.json");
 
 const createRollupParameters = require("./create_rollup_parameters.json");
-const genesis = require("./genesis.json");
+const genesis = require("./root.json");
 const deployOutput = require("./deploy_output.json");
 import "../helpers/utils";
 
 const pathOutputJson = path.join(__dirname, "./create_rollup_output.json");
-
-const deployParameters = require("./deploy_parameters.json");
 
 import {
     PolygonRollupManager,

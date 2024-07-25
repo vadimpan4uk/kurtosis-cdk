@@ -57,6 +57,19 @@ def run(plan, args):
         plan, args, node_config_artifact, genesis_artifact
     )
 
+    # wait syncronizer.
+    plan.exec(
+        description="Wait syncronyzer",
+        service_name="contracts" + args["deployment_suffix"],
+        recipe=ExecRecipe(
+            command=[
+                "/bin/sh",
+                "-c",
+                "sleep 10m",
+            ]
+        ),
+    )
+
     # Start the rest of the zkevm node components.
     keystore_artifacts = get_keystores_artifacts(plan, args)
     zkevm_node_components_configs = (

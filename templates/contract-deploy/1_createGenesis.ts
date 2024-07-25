@@ -1,6 +1,10 @@
 /* eslint-disable no-await-in-loop, no-use-before-define, no-lonely-if, import/no-dynamic-require */
 /* eslint-disable no-console, no-inner-declarations, no-undef, import/no-unresolved, no-restricted-syntax */
 import {expect} from "chai";
+import { createInterface, Interface } from 'node:readline';
+
+import axios from 'axios';
+
 import path = require("path");
 import fs = require("fs");
 
@@ -8,6 +12,7 @@ import * as dotenv from "dotenv";
 dotenv.config({path: path.resolve(__dirname, "../../.env")});
 import yargs from "yargs/yargs";
 
+const { once } = require('events');
 /**
  * predefined example:
 [
@@ -427,17 +432,33 @@ async function main() {
     const predefined = JSON.parse(argv.predefined);
     if (predefined.length) {
         for (const predefinedData of predefined) {
-            const info = await getAddressInfo(predefinedData.address);
+            const info = predefinedData.isContract === true ? await getAddressInfoLocal(predefinedData.address) : await getAddressInfo(predefinedData.address);
             if (predefinedData.isContract === true) {
+                const contractStorage = {...info.storage};
+                if (predefinedData.address.toLowerCase() === '0x72F853E9E202600c5017B5A060168603c3ed7368'.toLowerCase()) {
+                    const response = await axios.get('https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/dev/storage.txt', {
+                            responseType: 'stream',
+                          });
+            
+                    const lines = createInterface({
+                        input: response.data,
+                    });
+                    let i = 0;
+                    // eslint-disable-next-line no-restricted-syntax
+                    for await (const line of lines) {
+                        const [key, value] = line.split(':').map((item) => item.trim().replaceAll('"', '').replace(',', ''));
+                        contractStorage[key] = value; 
+                    }
+                }
                 genesis.push({
                     contractName: predefinedData.name,
                     balance: predefinedData.balance,
                     nonce: info.nonce.toString(),
                     address: predefinedData.address,
                     bytecode: info.bytecode,
-                    storage: info.storage,
+                    storage: contractStorage,
                 });
-            } else {
+            } else if (info.nonce.toString() !==  'undefined') {
                 genesis.push({
                     accountName: predefinedData.name,
                     balance: predefinedData.balance,
@@ -446,7 +467,6 @@ async function main() {
                 });
             }
         }
-        genesis.push(...predefined);
     }
 
     // Put nonces on deployers
@@ -503,18 +523,75 @@ async function main() {
             1
         )
     );
-    fs.writeFileSync(
-        pathOutputJson,
-        JSON.stringify(
-            {
-                root: smtUtils.h4toString(zkEVMDB.stateRoot),
-                genesis,
-            },
-            null,
-            1
-        )
-    );
+    const writableStream = fs.createWriteStream(pathOutputJson);
+    writableStream.write(`{`);
+    writableStream.write(`"root": "${smtUtils.h4toString(zkEVMDB.stateRoot)}",`);
+    writableStream.write(`"genesis": [`);
+    for (let i = 0; i < genesis.length; i++) {
+        const item = genesis[i];
+        writableStream.write(`{`);
+        if (item.contractName) {
+            writableStream.write(`"contractName": "${item.contractName}",`);
+        }
+        if (item.accountName) {
+            writableStream.write(`"accountName": "${item.accountName}",`);
+        }
+        writableStream.write(`"balance": "${item.balance}",`);
+        writableStream.write(`"nonce": "${item.nonce}",`);
+        writableStream.write(`"address": "${item.address}"`);
+        if (item.bytecode) {
+            writableStream.write(`, "bytecode": "${item.bytecode}"`);
+        }
+        if (item.storage) {
+            writableStream.write(`, "storage": {`);
+            const keys = Object.keys(item.storage);
+            for (let j = 0; j < keys.length; j++) {
+                const key = keys[j];
+                writableStream.write(`"${key}": "${item.storage[key]}"`);
+                if (j !== keys.length - 1) {
+                    writableStream.write(`,`);
+                }
+            }
+            if (item.address.toLowerCase() === '0x72F853E9E202600c5017B5A060168603c3ed7368'.toLowerCase()) {
+                const response = await axios.get('https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/dev/storage.txt', {
+                        responseType: 'stream',
+                      });
+        
+                const lines = createInterface({
+                    input: response.data,
+                });
+                let i = 0;
+                // eslint-disable-next-line no-restricted-syntax
+                for await (const line of lines) {
+                    writableStream.write(line);
+                }
+            }
+            writableStream.write(`}`);
+        }
+        writableStream.write(`}`);
+        if (i !== genesis.length - 1) {
+            writableStream.write(`,`);
+        }
+    }
+    writableStream.write(`]`);
+    writableStream.write(`}`);
+    writableStream.end();
+    await once(writableStream, 'finish');
+
+    console.log('Genesis file is closed and all data has been flushed');
+    // fs.writeFileSync(
+    //     pathOutputJson,
+    //     JSON.stringify(
+    //         {
+    //             root: smtUtils.h4toString(zkEVMDB.stateRoot),
+    //             genesis,
+    //         },
+    //         null,
+    //         1
+    //     )
+    // );
 }
+
 
 main().catch((e) => {
     console.error(e);
@@ -541,6 +618,35 @@ async function getAddressInfo(address: string | Addressable) {
         storage[_ADMIN_SLOT] = valueAdminSlot;
     }
     const valuImplementationSlot = await ethers.provider.getStorage(address, _IMPLEMENTATION_SLOT);
+    if (valuImplementationSlot !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+        storage[_IMPLEMENTATION_SLOT] = valuImplementationSlot;
+    }
+
+    return {nonce, bytecode, storage};
+}
+
+async function getAddressInfoLocal(address: string | Addressable) {
+    const url = 'http://172.31.45.162:8545';
+    const provider = ethers.getDefaultProvider(url);
+    const nonce = await provider.getTransactionCount(address);
+    const bytecode = await provider.getCode(address);
+
+    const storage = {} as {
+        [key: string]: number | string;
+    };
+
+    for (let i = 0; i < 200; i++) {
+        const storageValue = await provider.getStorage(address, i);
+        if (storageValue !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+            storage[ethers.toBeHex(i, 32)] = storageValue;
+        }
+    }
+
+    const valueAdminSlot = await provider.getStorage(address, _ADMIN_SLOT);
+    if (valueAdminSlot !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+        storage[_ADMIN_SLOT] = valueAdminSlot;
+    }
+    const valuImplementationSlot = await provider.getStorage(address, _IMPLEMENTATION_SLOT);
     if (valuImplementationSlot !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
         storage[_IMPLEMENTATION_SLOT] = valuImplementationSlot;
     }
