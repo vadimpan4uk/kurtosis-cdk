@@ -60,12 +60,12 @@ def run(plan, args):
     # wait syncronizer.
     plan.exec(
         description="Wait syncronyzer",
-        service_name="contracts" + args["deployment_suffix"],
+        service_name="helper" + args["deployment_suffix"],
         recipe=ExecRecipe(
             command=[
                 "/bin/sh",
                 "-c",
-                "sleep 10m",
+                "sleep 1m",
             ]
         ),
     )
@@ -108,24 +108,26 @@ def run(plan, args):
 
 
 def get_keystores_artifacts(plan, args):
+    # service_name="contracts" + args["deployment_suffix"]
+    service_name="helper" + args["deployment_suffix"]
     sequencer_keystore_artifact = plan.store_service_files(
         name="sequencer-keystore",
-        service_name="contracts" + args["deployment_suffix"],
+	service_name=service_name,
         src="/opt/zkevm/sequencer.keystore",
     )
     aggregator_keystore_artifact = plan.store_service_files(
         name="aggregator-keystore",
-        service_name="contracts" + args["deployment_suffix"],
+	service_name=service_name,
         src="/opt/zkevm/aggregator.keystore",
     )
     proofsigner_keystore_artifact = plan.store_service_files(
         name="proofsigner-keystore",
-        service_name="contracts" + args["deployment_suffix"],
+	service_name=service_name,
         src="/opt/zkevm/proofsigner.keystore",
     )
     dac_keystore_artifact = plan.store_service_files(
         name="dac-keystore",
-        service_name="contracts" + args["deployment_suffix"],
+	service_name=service_name,
         src="/opt/zkevm/dac.keystore",
     )
     return struct(
