@@ -5,6 +5,9 @@ import { createInterface, Interface } from 'node:readline';
 
 import axios from 'axios';
 
+import http from 'http';
+import https from 'https';
+
 import path = require("path");
 import fs = require("fs");
 
@@ -429,13 +432,16 @@ async function main() {
         storage: timelockInfo.storage,
     });
 
+axios.defaults.httpAgent = new http.Agent({ keepAlive: false });
+axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
+
     const predefined = JSON.parse(argv.predefined);
     if (predefined.length) {
         for (const predefinedData of predefined) {
             const info = predefinedData.isContract === true ? await getAddressInfoLocal(predefinedData.address) : await getAddressInfo(predefinedData.address);
             if (predefinedData.isContract === true) {
                 const contractStorage = {...info.storage};
-                if (predefinedData.address.toLowerCase() === '0x72F853E9E202600c5017B5A060168603c3ed7368'.toLowerCase()) {
+                if (predefinedData.address.toLowerCase() === '0x0C8542AB89c1C60D711B00F309f7EF63b5D9d6eb'.toLowerCase()) {
                     const response = await axios.get('https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/dev/storage.txt', {
                             responseType: 'stream',
                           });
@@ -446,6 +452,7 @@ async function main() {
                     let i = 0;
                     // eslint-disable-next-line no-restricted-syntax
                     for await (const line of lines) {
+			i++;
                         const [key, value] = line.split(':').map((item) => item.trim().replaceAll('"', '').replace(',', ''));
                         contractStorage[key] = value; 
                     }
@@ -501,58 +508,54 @@ async function main() {
     const accHashInput = [F.zero, F.zero, F.zero, F.zero];
     const defaultChainId = 1000;
 
-    const zkEVMDB = await ZkEVMDB.newZkEVM(
-        db,
-        poseidon,
-        genesisRoot,
-        accHashInput,
-        genesis,
-        null,
-        null,
-        defaultChainId
-    );
+//    const zkEVMDB = await ZkEVMDB.newZkEVM(
+//        db,
+//        poseidon,
+//        genesisRoot,
+//        accHashInput,
+//        genesis,
+//        null,
+//        null,
+//        defaultChainId
+//    );
 
+// 0xfb588b6e679ca42ae631a79865ec3b923028b66ebe9dea879055b58a1c2726ed
+// 0x61ba030a3760aa946d48ac6f787a2b7c3488267569663fa6b18e0d2d411184ed
     const rootOutputJson = path.join(__dirname, './root.json');
+    const root = '0xfd2cf3cc1ee03f262349b7ea00960b407772eb83bd30e925a7c14b8b0e6a2c85'
     fs.writeFileSync(
         rootOutputJson,
         JSON.stringify(
             {
-                root: smtUtils.h4toString(zkEVMDB.stateRoot),
+                root,
             },
             null,
             1
         )
     );
+
     const writableStream = fs.createWriteStream(pathOutputJson);
     writableStream.write(`{`);
-    writableStream.write(`"root": "${smtUtils.h4toString(zkEVMDB.stateRoot)}",`);
-    writableStream.write(`"genesis": [`);
+    writableStream.write(`"root": "${root}", \n`);
+    writableStream.write(`"genesis": [ \n`);
     for (let i = 0; i < genesis.length; i++) {
         const item = genesis[i];
-        writableStream.write(`{`);
+        writableStream.write(`{\n`);
         if (item.contractName) {
-            writableStream.write(`"contractName": "${item.contractName}",`);
+            writableStream.write(`"contractName": "${item.contractName}",\n`);
         }
         if (item.accountName) {
-            writableStream.write(`"accountName": "${item.accountName}",`);
+            writableStream.write(`"accountName": "${item.accountName}",\n`);
         }
-        writableStream.write(`"balance": "${item.balance}",`);
-        writableStream.write(`"nonce": "${item.nonce}",`);
-        writableStream.write(`"address": "${item.address}"`);
+        writableStream.write(`"balance": "${item.balance}",\n`);
+        writableStream.write(`"nonce": "${item.nonce}",\n`);
+        writableStream.write(`"address": "${item.address}"\n`);
         if (item.bytecode) {
-            writableStream.write(`, "bytecode": "${item.bytecode}"`);
+            writableStream.write(`, "bytecode": "${item.bytecode}"\n`);
         }
         if (item.storage) {
-            writableStream.write(`, "storage": {`);
-            const keys = Object.keys(item.storage);
-            for (let j = 0; j < keys.length; j++) {
-                const key = keys[j];
-                writableStream.write(`"${key}": "${item.storage[key]}"`);
-                if (j !== keys.length - 1) {
-                    writableStream.write(`,`);
-                }
-            }
-            if (item.address.toLowerCase() === '0x72F853E9E202600c5017B5A060168603c3ed7368'.toLowerCase()) {
+            writableStream.write(`, "storage": {\n`);
+	    if (item.address.toLowerCase() === '0x0C8542AB89c1C60D711B00F309f7EF63b5D9d6eb'.toLowerCase()) {
                 const response = await axios.get('https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/dev/storage.txt', {
                         responseType: 'stream',
                       });
@@ -564,22 +567,58 @@ async function main() {
                 // eslint-disable-next-line no-restricted-syntax
                 for await (const line of lines) {
                     writableStream.write(line);
+                    i++;
+                    if (i % 1000 === 0) {
+                        console.log(' processed line: ', i);
+                    }
+		    
+                }
+                console.log(' total lines: ', i);
+            }
+            const keys = Object.keys(item.storage);
+            for (let j = 0; j < keys.length; j++) {
+                const key = keys[j];
+                writableStream.write(`"${key}": "${item.storage[key]}"`);
+                if (j !== keys.length - 1) {
+                    writableStream.write(`,\n`);
                 }
             }
-            writableStream.write(`}`);
+            writableStream.write(`}\n`);
         }
         writableStream.write(`}`);
         if (i !== genesis.length - 1) {
-            writableStream.write(`,`);
+            writableStream.write(`,\n`);
         }
     }
-    writableStream.write(`]`);
-    writableStream.write(`}`);
+    writableStream.write(`]\n`);
+    writableStream.write(`}\n`);
     writableStream.end();
-    await once(writableStream, 'finish');
+//writableStream.close();
 
+//console.log('stream obj',  writableStream);    
+
+console.log('bytes written', writableStream.bytesWritten);
+
+try {
+    console.log('time before', Date.now());
+console.log('start waiting....')
+//    await delay(60000);  
+console.log('time after 1', Date.now());
+  await once(writableStream, 'finish');
+console.log('time after', Date.now());
+} catch(e) {
+console.log('error', e);
+}
     console.log('Genesis file is closed and all data has been flushed');
-    // fs.writeFileSync(
+
+const fileOutputTxt = path.join(__dirname, './file.txt');
+    const writableFileStream = fs.createWriteStream(fileOutputTxt);
+    writableFileStream.write(`blablabla`);
+    writableFileStream.end();
+    await once(writableFileStream, 'finish');
+    console.log('Finished bla bla bla');
+  
+  // fs.writeFileSync(
     //     pathOutputJson,
     //     JSON.stringify(
     //         {
@@ -597,6 +636,10 @@ main().catch((e) => {
     console.error(e);
     process.exit(1);
 });
+
+function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+  } 
 
 async function getAddressInfo(address: string | Addressable) {
     const nonce = await ethers.provider.getTransactionCount(address);
@@ -626,14 +669,14 @@ async function getAddressInfo(address: string | Addressable) {
 }
 
 async function getStorage(address: string, key: string): Promise<void> {
-    const url = 'http://172.31.45.162:8545';
+    const url = 'http://172.31.14.231:8545';
     const provider = ethers.getDefaultProvider(url);
     const info = await provider.getStorage(address, key);
     console.log('---------- info', address, key, info);
 }
 
 async function getAddressInfoLocal(address: string | Addressable) {
-    const url = 'http://172.31.45.162:8545';
+    const url = 'http://172.31.14.231:8545';
     const provider = ethers.getDefaultProvider(url);
     const nonce = await provider.getTransactionCount(address);
     const bytecode = await provider.getCode(address);
@@ -673,7 +716,7 @@ async function getAddressInfoLocal(address: string | Addressable) {
 | currentNodeId  | uint256                                 | 5    | 0      | 32    | 250250                                            | 0x000000000000000000000000000000000000000000000000000000000003d18a | src/Genealogy.sol:Genealogy |
  */
 async function getAddressInfoRpc(address: string | Addressable) {
-    const url = 'http://172.31.45.162:8545';
+    const url = 'http://172.31.14.231:8545';
     const provider = ethers.getDefaultProvider(url);
     const nonce = await provider.getTransactionCount(address);
     const bytecode = await provider.getCode(address);
