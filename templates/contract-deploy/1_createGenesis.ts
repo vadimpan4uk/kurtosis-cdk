@@ -525,11 +525,12 @@ axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
 // 0xfb588b6e679ca42ae631a79865ec3b923028b66ebe9dea879055b58a1c2726ed
 // 0x61ba030a3760aa946d48ac6f787a2b7c3488267569663fa6b18e0d2d411184ed
     const rootOutputJson = path.join(__dirname, './root.json');
+    const root = '0xfd2cf3cc1ee03f262349b7ea00960b407772eb83bd30e925a7c14b8b0e6a2c85';
     fs.writeFileSync(
         rootOutputJson,
         JSON.stringify(
             {
-                root: '0x3c20a9fc97fcf707b0edc1c0824b1d52971be71ac8ef390c5d47fca268e27910',
+		root
             },
             null,
             1
@@ -538,7 +539,7 @@ axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
 
     const writableStream = fs.createWriteStream(pathOutputJson);
     writableStream.write(`{`);
-    writableStream.write(`"root": "0x3c20a9fc97fcf707b0edc1c0824b1d52971be71ac8ef390c5d47fca268e27910", \n`);
+    writableStream.write(`"root": "${root}", \n`);
     writableStream.write(`"genesis": [ \n`);
     for (let i = 0; i < genesis.length; i++) {
         const item = genesis[i];
