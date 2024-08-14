@@ -53,9 +53,9 @@ def run(plan, args):
     )
 
     # Start the synchronizer.
-    #zkevm_node_package.start_synchronizer(
-    #    plan, args, node_config_artifact, genesis_artifact
-    #)
+    zkevm_node_package.start_synchronizer(
+        plan, args, node_config_artifact, genesis_artifact
+    )
 
     # Start the rest of the zkevm node components.
     keystore_artifacts = get_keystores_artifacts(plan, args)
