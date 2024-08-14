@@ -86,7 +86,11 @@ npx hardhat run deployment/testnet/prepareTestnet.ts --network localhost | tee 0
 echo_ts "Step 2: Creating genesis"
 cp /opt/contract-deploy/1_createGenesis.ts deployment/v2/1_createGenesis.ts
 echo_ts "Step 2: Creating genesis(replaced file)"
-NODE_OPTIONS="--max-old-space-size=20480000" MNEMONIC="{{.l1_preallocated_mnemonic}}" npx ts-node deployment/v2/1_createGenesis.ts --predefined='[{"isContract": false,"name": "admin","balance": "100000000000000000000000","address": "0x02d655B0396e40dA9fD80C0528f9C3fb488895Df"},{"isContract": true,"name": "GENEALOGY","balance": "100000000000000000000000","address": "0x0C8542AB89c1C60D711B00F309f7EF63b5D9d6eb"}]' | tee 02_create_genesis.out
+NODE_OPTIONS="--max-old-space-size=20480000" MNEMONIC="{{.l1_preallocated_mnemonic}}" npx ts-node deployment/v2/1_createGenesis.ts \ 
+    --genesisAdddress='{{.genesis_contract_address}}' \
+    --storageUrl='{{.genesis_storage_url}}' \
+    --rpcUrl='{{.l1_rpc_url}}' \
+    --predefined='[{"isContract": false,"name": "admin","balance": "100000000000000000000000","address": "0x02d655B0396e40dA9fD80C0528f9C3fb488895Df"},{"isContract": true,"name": "GENEALOGY","balance": "0","address": "0x0C8542AB89c1C60D711B00F309f7EF63b5D9d6eb"}]' | tee 02_create_genesis.out
 
 echo_ts "Step 3: Deploying PolygonZKEVMDeployer"
 npx hardhat run deployment/v2/2_deployPolygonZKEVMDeployer.ts --network localhost | tee 03_zkevm_deployer.out
@@ -113,6 +117,10 @@ popd
 # Combine contract deploy data.
 pushd /opt/zkevm/ || exit 1
 echo_ts "Creating combined.json"
+cat genesis.json | wc -l
+ls -lha 
+echo_ts "genesis.original.json lines count:"
+cat genesis.original.json | wc -l 
 cp genesis.json genesis.original.json
 jq --slurpfile rollup create_rollup_output.json '. + $rollup[0]' deploy_output.json > combined.json
 

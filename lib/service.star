@@ -20,7 +20,8 @@ def get_contract_setup_addresses(plan, args):
         command=["/bin/sh", "-c", "cat /opt/zkevm/combined.json"],
         extract=extract,
     )
-    service_name = "contracts"
+
+    service_name = args["src_service_name"]
     if "zkevm_rollup_manager_address" in args:
         service_name = "helper"
     service_name += args["deployment_suffix"]

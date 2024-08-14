@@ -56,14 +56,14 @@ def create_sequencer_service_config(args, config_artifact, genesis_artifact):
     sequencer_name = "zkevm-node-sequencer" + args["deployment_suffix"]
     sequencer_service_config = _create_node_component_service_config(
         image=data_availability_package.get_node_image(args),
-        ports={
-            "rpc": PortSpec(args["zkevm_rpc_http_port"], application_protocol="http"),
+	ports={
+            "rpc": PortSpec(args["zkevm_rpc_http_port"], application_protocol="http", wait=None),
             "data-streamer": PortSpec(
-                args["zkevm_data_streamer_port"], application_protocol="datastream"
+                args["zkevm_data_streamer_port"], application_protocol="datastream", wait=None
             ),
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=None),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=None
             ),
         },
         config_files=Directory(artifact_names=[config_artifact, genesis_artifact]),
