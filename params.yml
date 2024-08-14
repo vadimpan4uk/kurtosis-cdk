@@ -40,6 +40,13 @@ args:
   # 'contracts' or 'helper'
   src_service_name: "contracts"
 
+  # genesis root hash of the rollup chain. if empty it will be generated. 
+  root: "0xfd2cf3cc1ee03f262349b7ea00960b407772eb83bd30e925a7c14b8b0e6a2c85"
+  # genealogy contract address 
+  genealogy_contract_address: "0x0C8542AB89c1C60D711B00F309f7EF63b5D9d6eb"
+  # genealogy contract collected storage url
+  storageUrl: "https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/dev/storage.txt"
+
   # The type of data availability to use.
   # Options:
   # - 'rollup': Transaction data is stored on-chain on L1.

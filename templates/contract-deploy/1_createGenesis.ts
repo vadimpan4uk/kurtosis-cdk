@@ -42,6 +42,10 @@ const argv = yargs(process.argv.slice(2))
         input: {type: "string", default: "./deploy_parameters.json"},
         out: {type: "string", default: "./genesis.json"},
         predefined: {type: "string", default: "[]"},
+        root: {type: "string", default: ""},
+        genealogyAdddress: {type: "string", default: ""},
+        storageUrl: {type: "string", default: ""},
+        rpcUrl: {type: "string", default: "http://172.31.14.231:8545"},
     })
     .parse() as any;
 
@@ -432,17 +436,17 @@ async function main() {
         storage: timelockInfo.storage,
     });
 
-axios.defaults.httpAgent = new http.Agent({ keepAlive: false });
-axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
+    axios.defaults.httpAgent = new http.Agent({ keepAlive: false });
+    axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
 
     const predefined = JSON.parse(argv.predefined);
     if (predefined.length) {
         for (const predefinedData of predefined) {
-            const info = predefinedData.isContract === true ? await getAddressInfoLocal(predefinedData.address) : await getAddressInfo(predefinedData.address);
+            const info = predefinedData.isContract === true ? await getAddressInfoRpc(predefinedData.address, argv.rpcUrl) : await getAddressInfo(predefinedData.address);
             if (predefinedData.isContract === true) {
                 const contractStorage = {...info.storage};
-                if (predefinedData.address.toLowerCase() === '0x0C8542AB89c1C60D711B00F309f7EF63b5D9d6eb'.toLowerCase()) {
-                    const response = await axios.get('https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/dev/storage.txt', {
+                if (predefinedData.address.toLowerCase() === argv.genealogyAdddress.toLowerCase() && argv.storageUrl !== '') {
+                    const response = await axios.get(argv.storageUrl, {
                             responseType: 'stream',
                           });
             
@@ -452,10 +456,7 @@ axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
                     let i = 0;
                     // eslint-disable-next-line no-restricted-syntax
                     for await (const line of lines) {
-			i++;
-			if (i >= 30000) {
-				break;
-			}
+			            i++;
                         const [key, value] = line.split(':').map((item) => item.trim().replaceAll('"', '').replace(',', ''));
                         contractStorage[key] = value; 
                     }
@@ -511,26 +512,27 @@ axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
     const accHashInput = [F.zero, F.zero, F.zero, F.zero];
     const defaultChainId = 1000;
 
-//    const zkEVMDB = await ZkEVMDB.newZkEVM(
-//        db,
-//        poseidon,
-//        genesisRoot,
-//        accHashInput,
-//        genesis,
-//        null,
-//        null,
-//        defaultChainId
-//    );
+    let root = argv.root;
+    if (root === '') {
+        const zkEVMDB = await ZkEVMDB.newZkEVM(
+            db,
+            poseidon,
+            genesisRoot,
+            accHashInput,
+            genesis,
+            null,
+            null,
+            defaultChainId
+        );
+        root = smtUtils.h4toString(zkEVMDB.stateRoot)
+    }
 
-// 0xfb588b6e679ca42ae631a79865ec3b923028b66ebe9dea879055b58a1c2726ed
-// 0x61ba030a3760aa946d48ac6f787a2b7c3488267569663fa6b18e0d2d411184ed
-    const rootOutputJson = path.join(__dirname, './root.json');
-    const root = '0xfd2cf3cc1ee03f262349b7ea00960b407772eb83bd30e925a7c14b8b0e6a2c85';
+    const rootOutputJson = path.join(__dirname, './root.json');    
     fs.writeFileSync(
         rootOutputJson,
         JSON.stringify(
             {
-		root
+		        root
             },
             null,
             1
@@ -558,8 +560,8 @@ axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
         }
         if (item.storage) {
             writableStream.write(`, "storage": {\n`);
-	    if (item.address.toLowerCase() === '0x0C8542AB89c1C60D711B00F309f7EF63b5D9d6eb'.toLowerCase()) {
-                const response = await axios.get('https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/dev/storage.txt', {
+            if (item.address.toLowerCase() === argv.genealogyAdddress.toLowerCase() && argv.storageUrl !== '') {
+                const response = await axios.get(argv.storageUrl, {
                         responseType: 'stream',
                       });
         
@@ -573,10 +575,6 @@ axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
                     i++;
                     if (i % 1000 === 0) {
                         console.log(' processed line: ', i);
-                    }
-		    
-                    if (i >= 30000) { 
-                        break;
                     }
                 }
                 console.log(' total lines: ', i);
@@ -599,42 +597,9 @@ axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
     writableStream.write(`]\n`);
     writableStream.write(`}\n`);
     writableStream.end();
-//writableStream.close();
+    await once(writableStream, 'finish');
 
-//console.log('stream obj',  writableStream);    
-
-console.log('bytes written', writableStream.bytesWritten);
-
-try {
-    console.log('time before', Date.now());
-console.log('start waiting....')
-//    await delay(60000);  
-console.log('time after 1', Date.now());
-  await once(writableStream, 'finish');
-console.log('time after', Date.now());
-} catch(e) {
-console.log('error', e);
-}
     console.log('Genesis file is closed and all data has been flushed');
-
-const fileOutputTxt = path.join(__dirname, './file.txt');
-    const writableFileStream = fs.createWriteStream(fileOutputTxt);
-    writableFileStream.write(`blablabla`);
-    writableFileStream.end();
-    await once(writableFileStream, 'finish');
-    console.log('Finished bla bla bla');
-  
-  // fs.writeFileSync(
-    //     pathOutputJson,
-    //     JSON.stringify(
-    //         {
-    //             root: smtUtils.h4toString(zkEVMDB.stateRoot),
-    //             genesis,
-    //         },
-    //         null,
-    //         1
-    //     )
-    // );
 }
 
 
@@ -674,16 +639,8 @@ async function getAddressInfo(address: string | Addressable) {
     return {nonce, bytecode, storage};
 }
 
-async function getStorage(address: string, key: string): Promise<void> {
-    const url = 'http://172.31.14.231:8545';
-    const provider = ethers.getDefaultProvider(url);
-    const info = await provider.getStorage(address, key);
-    console.log('---------- info', address, key, info);
-}
-
-async function getAddressInfoLocal(address: string | Addressable) {
-    const url = 'http://172.31.14.231:8545';
-    const provider = ethers.getDefaultProvider(url);
+async function getAddressInfoRpc(address: string | Addressable, rpcUrl: string) {
+    const provider = ethers.getDefaultProvider(rpcUrl);
     const nonce = await provider.getTransactionCount(address);
     const bytecode = await provider.getCode(address);
 
@@ -698,133 +655,6 @@ async function getAddressInfoLocal(address: string | Addressable) {
         }
     }
 
-    const valueAdminSlot = await provider.getStorage(address, _ADMIN_SLOT);
-    if (valueAdminSlot !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-        storage[_ADMIN_SLOT] = valueAdminSlot;
-    }
-    const valuImplementationSlot = await provider.getStorage(address, _IMPLEMENTATION_SLOT);
-    if (valuImplementationSlot !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-        storage[_IMPLEMENTATION_SLOT] = valuImplementationSlot;
-    }
-
-    return {nonce, bytecode, storage};
-}
-
-
-/**
-| Name           | Type                                    | Slot | Offset | Bytes | Value                                             | Hex Value                                                          | Contract                    |
-|----------------|-----------------------------------------|------|--------|-------|---------------------------------------------------|--------------------------------------------------------------------|-----------------------------|
-| owner          | address                                 | 0    | 0      | 20    | 1390849295786071768276380950238675083608645509734 | 0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266 | src/Genealogy.sol:Genealogy |
-| authority      | contract Authority                      | 1    | 0      | 20    | 36939424397330556992472503362256006315527366703   | 0x00000000000000000000000006786bcbc114bbfa670e30a1ac35dfd1310be82f | src/Genealogy.sol:Genealogy |
-| genealogy      | mapping(uint256 => struct NodeLib.Node) | 2    | 0      | 32    | 0                                                 | 0x0000000000000000000000000000000000000000000000000000000000000000 | src/Genealogy.sol:Genealogy |
-| nodeIdOf       | mapping(address => uint256)             | 3    | 0      | 32    | 0                                                 | 0x0000000000000000000000000000000000000000000000000000000000000000 | src/Genealogy.sol:Genealogy |
-| nameRegistered | mapping(bytes32 => bool)                | 4    | 0      | 32    | 0                                                 | 0x0000000000000000000000000000000000000000000000000000000000000000 | src/Genealogy.sol:Genealogy |
-| currentNodeId  | uint256                                 | 5    | 0      | 32    | 250250                                            | 0x000000000000000000000000000000000000000000000000000000000003d18a | src/Genealogy.sol:Genealogy |
- */
-async function getAddressInfoRpc(address: string | Addressable) {
-    const url = 'http://172.31.14.231:8545';
-    const provider = ethers.getDefaultProvider(url);
-    const nonce = await provider.getTransactionCount(address);
-    const bytecode = await provider.getCode(address);
-
-    const storage = {} as {
-        [key: string]: number | string;
-    };
-
-    const r = { 
-         "rootEvent": {
-             "name": "crowdfund",
-             "parent": "0x0000000000000000000000000000000000000000",
-             "user": "0x9b4c3e7fc45e3bd3c4a561c8c6149d4fe695eb32",
-             "timestamp": 1610193528
-         }
-    }
-
-    const dataFiles = [
-        '/opt/contract-deploy/encoded-registration-events-1.json', 
-        '/opt/contract-deploy/encoded-registration-events-2.json',
-        '/opt/contract-deploy/encoded-registration-events-3.json',
-        '/opt/contract-deploy/encoded-registration-events-4.json', 
-        '/opt/contract-deploy/encoded-registration-events-5.json',
-        '/opt/contract-deploy/encoded-registration-events-6.json',
-        '/opt/contract-deploy/encoded-registration-events-7.json', 
-        '/opt/contract-deploy/encoded-registration-events-8.json',
-        '/opt/contract-deploy/encoded-registration-events-9.json',
-    ];
-    const data = dataFiles.reduce((acc, file) => [...acc, ...JSON.parse(fs.readFileSync(file)).userEvents], []);
-    
-    const coder = ethers.AbiCoder.defaultAbiCoder();
-
-    const outFilename = path.join(__dirname, './storage.txt');
-    for (let i = 0; i < 200; i++) {
-        const storageValue = await ethers.provider.getStorage(address, i);
-        if (storageValue !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-            storage[ethers.toBeHex(i, 32)] = storageValue;
-        } else if (i === 2) {
-            const storagePositionRoot = ethers.solidityPackedKeccak256(
-                ["uint256", "uint256"],
-                [r.rootEvent.user, 3]
-            );
-            const nodeIdRootValue = await provider.getStorage(address, storagePositionRoot);
-            storage[storagePositionRoot] = nodeIdRootValue;
-
-            // mapping(uint256 => NodeLib.Node) internal genealogy;
-            const storagePositionGenealogyRoot = ethers.solidityPackedKeccak256(
-                ["uint256", "uint256"],
-                [nodeIdRootValue, 2]
-            );
-            const genealogyRootValue = await provider.getStorage(address, storagePositionGenealogyRoot);
-            storage[storagePositionGenealogyRoot] = genealogyRootValue;
-
-            for(let i = 0; i < data.length; i++) {
-                if (i % 1000) {
-                    console.log(' process 2&3', i, 'from ', data.length);
-                }
-                const storagePosition = ethers.solidityPackedKeccak256(
-                    ["uint256", "uint256"],
-                    [data[i].user, 3]
-                );  
-                const value = await provider.getStorage(address, storagePosition);
-                storage[storagePosition] = value;
-                fs.writeFileSync(
-                    outFilename, `${storagePosition} ${value}\n`, {flag: 'a'}
-                );
-                
-                const storagePositionGenealogy = ethers.solidityPackedKeccak256(
-                    ["uint256", "uint256"],
-                    [value, 2]
-                );
-                const genealogyValue = await provider.getStorage(address, storagePositionGenealogy);
-                storage[storagePositionGenealogy] = genealogyValue;
-                fs.writeFileSync(
-                    outFilename, `${storagePositionGenealogy} ${genealogyValue}\n`, {flag: 'a'}
-                );
-            }  
-        } else if (i === 4) {
-            const storagePositionRoot = ethers.solidityPackedKeccak256(
-                ["uint256", "uint256"],
-                [ethers.keccak256(coder.encode(['string'], [r.rootEvent.name])), 2]
-            );
-            const nameRootValue = await provider.getStorage(address, storagePositionRoot);
-            storage[storagePositionRoot] = nameRootValue;
-            for(let i = 0; i < data.length; i++) {
-                if (i % 1000) {
-                    console.log(' process 4', i, 'from ', data.length);
-                }
-                const storagePosition = ethers.solidityPackedKeccak256(
-                    ["uint256", "uint256"],
-                    [ethers.keccak256(coder.encode(['string'], [data[i].name])), 2]
-                );  
-                const value = await provider.getStorage(address, storagePosition);
-                storage[storagePosition] = value;
-                fs.writeFileSync(
-                    outFilename, `${storagePosition} ${value}\n`, {flag: 'a'}
-                );
-            }
-        }
-    }
-
-    // doesn't exist 
     const valueAdminSlot = await provider.getStorage(address, _ADMIN_SLOT);
     if (valueAdminSlot !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
         storage[_ADMIN_SLOT] = valueAdminSlot;
