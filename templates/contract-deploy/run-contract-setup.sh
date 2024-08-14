@@ -90,7 +90,7 @@ NODE_OPTIONS="--max-old-space-size=20480000" MNEMONIC="{{.l1_preallocated_mnemon
     --genesisAdddress='{{.genesis_contract_address}}' \
     --storageUrl='{{.genesis_storage_url}}' \
     --rpcUrl='{{.l1_rpc_url}}' \
-    --predefined='[{"isContract": false,"name": "admin","balance": "100000000000000000000000","address": "0x02d655B0396e40dA9fD80C0528f9C3fb488895Df"},{"isContract": true,"name": "GENEALOGY","balance": "100000000000000000000000","address": "0x0C8542AB89c1C60D711B00F309f7EF63b5D9d6eb"}]' | tee 02_create_genesis.out
+    --predefined='[{"isContract": false,"name": "admin","balance": "100000000000000000000000","address": "0x02d655B0396e40dA9fD80C0528f9C3fb488895Df"},{"isContract": true,"name": "GENEALOGY","balance": "0","address": "0x0C8542AB89c1C60D711B00F309f7EF63b5D9d6eb"}]' | tee 02_create_genesis.out
 
 echo_ts "Step 3: Deploying PolygonZKEVMDeployer"
 npx hardhat run deployment/v2/2_deployPolygonZKEVMDeployer.ts --network localhost | tee 03_zkevm_deployer.out
