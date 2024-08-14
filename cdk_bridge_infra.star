@@ -8,8 +8,7 @@ def run(plan, args):
     contract_setup_addresses = service_package.get_contract_setup_addresses(plan, args)
     db_configs = databases.get_db_configs(args["deployment_suffix"])
 
-    # service_name="contracts" + args["deployment_suffix"]
-    service_name="helper" + args["deployment_suffix"]
+    service_name=args["src_service_name"] + args["deployment_suffix"]
     # Create the bridge service config.
     bridge_config_artifact = create_bridge_config_artifact(
         plan, args, contract_setup_addresses, db_configs

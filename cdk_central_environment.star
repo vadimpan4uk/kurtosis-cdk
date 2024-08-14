@@ -95,8 +95,7 @@ def run(plan, args):
 
 
 def get_keystores_artifacts(plan, args):
-    # service_name="contracts" + args["deployment_suffix"]
-    service_name="helper" + args["deployment_suffix"]
+    service_name=args["src_service_name"] + args["deployment_suffix"]
     sequencer_keystore_artifact = plan.store_service_files(
         name="sequencer-keystore",
 	service_name=service_name,

@@ -98,7 +98,7 @@ def run(
         plan.print("Getting genesis file...")
         genesis_artifact = plan.store_service_files(
             name="genesis",
-            service_name="helper" + args["deployment_suffix"],
+            service_name=args["src_service_name"] + args["deployment_suffix"],
             src="/opt/zkevm/genesis.json",
         )
 
@@ -200,7 +200,7 @@ def deploy_helper_service2(plan, args):
     )
 
     # Deploy helper service.
-    helper_service_name = "helper" + args["deployment_suffix"]
+    helper_service_name = args["src_service_name"] + args["deployment_suffix"]
     plan.add_service(
         name=helper_service_name,
         config=ServiceConfig(
@@ -245,7 +245,7 @@ def deploy_helper_service(plan, args):
     )
 
     # Deploy helper service.
-    helper_service_name = "helper" + args["deployment_suffix"]
+    helper_service_name = args["src_service_name"] + args["deployment_suffix"]
     plan.add_service(
         name=helper_service_name,
         config=ServiceConfig(

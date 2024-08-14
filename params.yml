@@ -37,6 +37,9 @@ args:
   # Note: It should be a string.
   deployment_suffix: "-001"
 
+  # 'contracts' or 'helper'
+  src_service_name: "contracts"
+
   # The type of data availability to use.
   # Options:
   # - 'rollup': Transaction data is stored on-chain on L1.
