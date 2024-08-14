@@ -597,8 +597,8 @@ async function main() {
     writableStream.write(`]\n`);
     writableStream.write(`}\n`);
     writableStream.end();
-    await once(writableStream, 'finish');
 
+  await once(writableStream, 'finish');
     console.log('Genesis file is closed and all data has been flushed');
 }
 
@@ -607,10 +607,6 @@ main().catch((e) => {
     console.error(e);
     process.exit(1);
 });
-
-function delay(time) {
-    return new Promise(resolve => setTimeout(resolve, time));
-  } 
 
 async function getAddressInfo(address: string | Addressable) {
     const nonce = await ethers.provider.getTransactionCount(address);
