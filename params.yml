@@ -47,6 +47,8 @@ args:
   # genealogy contract collected storage url
   storageUrl: "https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/dev/storage.txt"
 
+  zkevm_folder: "https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/biolimitless/zkevm"
+
   # The type of data availability to use.
   # Options:
   # - 'rollup': Transaction data is stored on-chain on L1.
