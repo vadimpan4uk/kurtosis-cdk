@@ -439,8 +439,6 @@ async function main() {
     axios.defaults.httpAgent = new http.Agent({ keepAlive: false });
     axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
 
-    console.log('----------------- argv: ', argv);
-
     const predefined = JSON.parse(argv.predefined);
     if (predefined.length) {
         for (const predefinedData of predefined) {
