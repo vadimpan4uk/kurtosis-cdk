@@ -76,6 +76,12 @@ DEFAULT_ARGS = {
     "blutgang_image": "makemake1337/blutgang:0.3.5",
     "blutgang_rpc_port": 55555,
     "blutgang_admin_port": 55556,
+    src_service_name: "contracts"
+
+    root: ""
+    genealogy_contract_address: ""
+    genesis_storage_url: ""
+    zkevm_folder: ""
 }
 
 
