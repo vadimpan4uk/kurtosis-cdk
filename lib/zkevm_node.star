@@ -41,9 +41,9 @@ def start_synchronizer(plan, args, config_artifact, genesis_artifact):
     synchronizer_service_config = _create_node_component_service_config(
         image=data_availability_package.get_node_image(args),
         ports={
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=None),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=None
             ),
         },
         config_files=Directory(artifact_names=[config_artifact, genesis_artifact]),
