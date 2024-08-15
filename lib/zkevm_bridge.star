@@ -16,7 +16,7 @@ def create_bridge_service_config(args, config_artifact, claimtx_keystore_artifac
         entrypoint=[
             "/app/zkevm-bridge",
         ],
-        cmd=["run", "--cfg", "/etc/zkevm/bridge-config2.toml"],
+        cmd=["run", "--cfg", "/etc/zkevm/bridge-config.toml"],
     )
     return {bridge_service_name: bridge_service_config}
 
