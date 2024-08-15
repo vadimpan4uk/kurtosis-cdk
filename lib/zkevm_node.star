@@ -80,9 +80,9 @@ def create_sequence_sender_service_config(
     sequence_sender_service_config = _create_node_component_service_config(
         image=data_availability_package.get_node_image(args),
         ports={
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=None),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=None
             ),
         },
         config_files=Directory(
@@ -110,11 +110,11 @@ def create_aggregator_service_config(
         image=data_availability_package.get_node_image(args),
         ports={
             "aggregator": PortSpec(
-                args["zkevm_aggregator_port"], application_protocol="grpc"
+                args["zkevm_aggregator_port"], application_protocol="grpc", wait=None
             ),
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=None),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=None
             ),
         },
         config_files=Directory(
@@ -137,12 +137,12 @@ def create_rpc_service_config(args, config_artifact, genesis_artifact):
         image=data_availability_package.get_node_image(args),
         ports={
             "http-rpc": PortSpec(
-                args["zkevm_rpc_http_port"], application_protocol="http"
+                args["zkevm_rpc_http_port"], application_protocol="http", wait=None
             ),
-            "ws-rpc": PortSpec(args["zkevm_rpc_ws_port"], application_protocol="ws"),
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http"),
+            "ws-rpc": PortSpec(args["zkevm_rpc_ws_port"], application_protocol="ws", wait=None),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=None),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=None
             ),
         },
         config_files=Directory(artifact_names=[config_artifact, genesis_artifact]),
@@ -163,9 +163,9 @@ def create_eth_tx_manager_service_config(
     eth_tx_manager_service_config = _create_node_component_service_config(
         image=data_availability_package.get_node_image(args),
         ports={
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=None),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=None
             ),
         },
         config_files=Directory(
@@ -186,9 +186,9 @@ def create_l2_gas_pricer_service_config(args, config_artifact, genesis_artifact)
     l2_gas_pricer_service_config = _create_node_component_service_config(
         image=data_availability_package.get_node_image(args),
         ports={
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=None),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=None
             ),
         },
         config_files=Directory(artifact_names=[config_artifact, genesis_artifact]),
