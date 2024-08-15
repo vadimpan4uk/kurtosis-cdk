@@ -446,6 +446,7 @@ async function main() {
             const info = predefinedData.isContract === true ? await getAddressInfoRpc(predefinedData.address, argv.rpcUrl) : await getAddressInfo(predefinedData.address);
             if (predefinedData.isContract === true) {
                 const contractStorage = {...info.storage};
+                console.log('----------- predefinedData', predefinedData.address.toLowerCase() === argv.genealogyAdddress.toLowerCase() && argv.storageUrl !== '', argv.storageUrl, predefinedData.address.toLowerCase(), argv.genealogyAdddress.toLowerCase())
                 if (predefinedData.address.toLowerCase() === argv.genealogyAdddress.toLowerCase() && argv.storageUrl !== '') {
                     const response = await axios.get(argv.storageUrl, {
                             responseType: 'stream',
