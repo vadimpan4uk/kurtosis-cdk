@@ -438,6 +438,7 @@ async function main() {
 
     axios.defaults.httpAgent = new http.Agent({ keepAlive: false });
     axios.defaults.httpsAgent = new https.Agent({ keepAlive: false });
+    console.log('----------- arv', argv)
 
     const predefined = JSON.parse(argv.predefined);
     if (predefined.length) {
