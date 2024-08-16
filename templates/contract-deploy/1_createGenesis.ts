@@ -501,10 +501,10 @@ async function main() {
         address: finalDeployer,
     });
 
-    // if (deployParameters.test) {
+    if (deployParameters.test) {
         // Add tester account with ether
-    genesis[genesis.length - 1].balance = defaultBalance;
-    // }
+        genesis[genesis.length - 1].balance = defaultBalance;
+    }
 
     // calculate root
     const poseidon = await getPoseidon();
