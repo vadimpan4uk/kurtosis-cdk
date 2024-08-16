@@ -1,4 +1,5 @@
 POSTGRES_IMAGE = "postgres:16.2"
+POSTGRES_HOST = ""
 POSTGRES_SERVICE_NAME = "postgres"
 POSTGRES_PORT = 5432
 POSTGRES_MASTER_DB = "master"
@@ -50,7 +51,10 @@ DATABASES = CDK_DATABASES | {
 
 
 def _service_name(suffix):
-    return POSTGRES_SERVICE_NAME + suffix
+    if POSTGRES_HOST != "":
+        return POSTGRES_HOST
+    else:
+        return POSTGRES_SERVICE_NAME + suffix
 
 
 def _pless_suffix(suffix):
