@@ -81,7 +81,8 @@ DEFAULT_ARGS = {
     "genealogy_contract_address": "",
     "genesis_storage_url": "",
     "zkevm_folder": "",
-    "genesis_storage_json_url": ""
+    "genesis_storage_json_url": "",
+    "healthcheck_wait": "15s"
 }
 
 

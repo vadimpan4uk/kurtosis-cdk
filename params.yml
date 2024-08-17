@@ -33,6 +33,7 @@ deploy_blutgang: false
 apply_workload: false
 
 args:
+  healthcheck_wait: "10m"
   # Suffix appended to service names.
   # Note: It should be a string.
   deployment_suffix: "-001"

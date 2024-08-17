@@ -41,9 +41,9 @@ def start_synchronizer(plan, args, config_artifact, genesis_artifact):
     synchronizer_service_config = _create_node_component_service_config(
         image=data_availability_package.get_node_image(args),
         ports={
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait="3h"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=args["healthcheck_wait"]),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http", wait="3h"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=args["healthcheck_wait"]
             ),
         },
         config_files=Directory(artifact_names=[config_artifact, genesis_artifact]),
@@ -57,13 +57,13 @@ def create_sequencer_service_config(args, config_artifact, genesis_artifact):
     sequencer_service_config = _create_node_component_service_config(
         image=data_availability_package.get_node_image(args),
 	ports={
-            "rpc": PortSpec(args["zkevm_rpc_http_port"], application_protocol="http", wait="3h"),
+            "rpc": PortSpec(args["zkevm_rpc_http_port"], application_protocol="http", wait=args["healthcheck_wait"]),
             "data-streamer": PortSpec(
-                args["zkevm_data_streamer_port"], application_protocol="datastream", wait="3h"
+                args["zkevm_data_streamer_port"], application_protocol="datastream", wait=args["healthcheck_wait"]
             ),
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait="3h"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=args["healthcheck_wait"]),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http", wait="3h"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=args["healthcheck_wait"]
             ),
         },
         config_files=Directory(artifact_names=[config_artifact, genesis_artifact]),
@@ -80,9 +80,9 @@ def create_sequence_sender_service_config(
     sequence_sender_service_config = _create_node_component_service_config(
         image=data_availability_package.get_node_image(args),
         ports={
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait="3h"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=args["healthcheck_wait"]),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http", wait="3h"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=args["healthcheck_wait"]
             ),
         },
         config_files=Directory(
@@ -110,11 +110,11 @@ def create_aggregator_service_config(
         image=data_availability_package.get_node_image(args),
         ports={
             "aggregator": PortSpec(
-                args["zkevm_aggregator_port"], application_protocol="grpc", wait="3h"
+                args["zkevm_aggregator_port"], application_protocol="grpc", wait=args["healthcheck_wait"]
             ),
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait="3h"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=args["healthcheck_wait"]),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http", wait="3h"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=args["healthcheck_wait"]
             ),
         },
         config_files=Directory(
@@ -137,12 +137,12 @@ def create_rpc_service_config(args, config_artifact, genesis_artifact):
         image=data_availability_package.get_node_image(args),
         ports={
             "http-rpc": PortSpec(
-                args["zkevm_rpc_http_port"], application_protocol="http", wait="3h"
+                args["zkevm_rpc_http_port"], application_protocol="http", wait=args["healthcheck_wait"]
             ),
-            "ws-rpc": PortSpec(args["zkevm_rpc_ws_port"], application_protocol="ws", wait="3h"),
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait="3h"),
+            "ws-rpc": PortSpec(args["zkevm_rpc_ws_port"], application_protocol="ws", wait=args["healthcheck_wait"]),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=args["healthcheck_wait"]),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http", wait="3h"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=args["healthcheck_wait"]
             ),
         },
         config_files=Directory(artifact_names=[config_artifact, genesis_artifact]),
@@ -163,9 +163,9 @@ def create_eth_tx_manager_service_config(
     eth_tx_manager_service_config = _create_node_component_service_config(
         image=data_availability_package.get_node_image(args),
         ports={
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait="3h"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=args["healthcheck_wait"]),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http", wait="3h"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=args["healthcheck_wait"]
             ),
         },
         config_files=Directory(
@@ -186,9 +186,9 @@ def create_l2_gas_pricer_service_config(args, config_artifact, genesis_artifact)
     l2_gas_pricer_service_config = _create_node_component_service_config(
         image=data_availability_package.get_node_image(args),
         ports={
-            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait="3h"),
+            "pprof": PortSpec(args["zkevm_pprof_port"], application_protocol="http", wait=args["healthcheck_wait"]),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http", wait="3h"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=args["healthcheck_wait"]
             ),
         },
         config_files=Directory(artifact_names=[config_artifact, genesis_artifact]),
