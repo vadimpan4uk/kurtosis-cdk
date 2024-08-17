@@ -3,9 +3,9 @@ def create_bridge_service_config(args, config_artifact, claimtx_keystore_artifac
     bridge_service_config = ServiceConfig(
         image=args["zkevm_bridge_service_image"],
         ports={
-            "rpc": PortSpec(args["zkevm_bridge_rpc_port"], application_protocol="http", wait=None),
+            "rpc": PortSpec(args["zkevm_bridge_rpc_port"], application_protocol="http"),
             "grpc": PortSpec(
-                args["zkevm_bridge_grpc_port"], application_protocol="grpc", wait=None
+                args["zkevm_bridge_grpc_port"], application_protocol="grpc"
             ),
         },
         files={
@@ -28,7 +28,7 @@ def start_bridge_ui(plan, args, config_artifact):
             image=args["zkevm_bridge_ui_image"],
             ports={
                 "web-ui": PortSpec(
-                    args["zkevm_bridge_ui_port"], application_protocol="http", wait=None
+                    args["zkevm_bridge_ui_port"], application_protocol="http"
                 ),
             },
             files={
@@ -51,8 +51,7 @@ def start_reverse_proxy(plan, args, config_artifact):
             ports={
                 "web-ui": PortSpec(
                     number=80,
-                    application_protocol="http",
-		    wait=None
+                    application_protocol="http"
                 ),
             },
             files={
