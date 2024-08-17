@@ -437,11 +437,11 @@ L2GasPriceSuggesterFactor = 1
 # ------------------------------------------------------------------------------
 Host = "0.0.0.0"
 
+Port = {{.zkevm_rpc_http_port}}
+
 # ------------------------------------------------------------------------------
 # Port is used to configure which port our RPC http server will listen on
 # ------------------------------------------------------------------------------
-Port = {{.zkevm_rpc_http_port}}
-
 # ------------------------------------------------------------------------------
 # ReadTimeout determines the maximal amount of time that a client can
 # spend sending us their request. After the configured amount of time
@@ -557,11 +557,11 @@ Enabled = true
 # ------------------------------------------------------------------------------
 Host = "0.0.0.0"
 
+Port = {{.zkevm_rpc_ws_port}}
+
 # ------------------------------------------------------------------------------
 # Port specifies the port that websocket server will listen on
 # ------------------------------------------------------------------------------
-Port = {{.zkevm_rpc_ws_port}}
-
 # ------------------------------------------------------------------------------
 # ReadLimit will determine the max number of bytes for a message
 # ------------------------------------------------------------------------------
@@ -966,12 +966,12 @@ EnableLog = true
 
 [Sequencer.StreamServer]
 
+Port = {{.zkevm_data_streamer_port}}
+
 # ------------------------------------------------------------------------------
 # Port will configure the port that the data streamer server will
 # listen on
 # ------------------------------------------------------------------------------
-Port = {{.zkevm_data_streamer_port}}
-
 # ------------------------------------------------------------------------------
 # Filename is a location on disk that stores the stream file. This
 # will need to be writable by the application
@@ -988,6 +988,8 @@ Filename = "/tmp/datastream.bin"
 # ------------------------------------------------------------------------------
 Version = 0
 
+ChainID = {{.zkevm_rollup_chain_id}}
+
 # ------------------------------------------------------------------------------
 # ChainID is used to set the system id of the datastreamer. Like the
 # version this also written to the header and can be used to determine
@@ -997,8 +999,6 @@ Version = 0
 # value from on chain
 #
 # ------------------------------------------------------------------------------
-ChainID = {{.zkevm_rollup_chain_id}}
-
 # ------------------------------------------------------------------------------
 # Enabled is used to turn the datastreamer on or off.
 # ------------------------------------------------------------------------------
@@ -1062,7 +1062,7 @@ LastBatchVirtualizationTimeMaxWaitPeriod = "5s"
 # virtualizing. If the time of the last L1 block and the last L2 block
 # is too close, we'll wait longer before attempting to sequence.
 # ------------------------------------------------------------------------------
-L1BlockTimestampMargin = "30s"
+L1BlockTimestampMargin = "900s"
 
 # ------------------------------------------------------------------------------
 # MaxTxSizeForL1 is the maximum size a single transaction can
@@ -1136,11 +1136,11 @@ Password = "{{.zkevm_l2_keystore_password}}"
 # ------------------------------------------------------------------------------
 Host = "0.0.0.0"
 
+Port = {{.zkevm_aggregator_port}}
+
 # ------------------------------------------------------------------------------
 # Port is the port that the aggregator service will be listening on
 # ------------------------------------------------------------------------------
-Port = {{.zkevm_aggregator_port}}
-
 # ------------------------------------------------------------------------------
 # RetryTime is the amount of time that the main loop will wait between
 # checking for proofs to aggregate or batches to prove.
@@ -1188,6 +1188,8 @@ TxProfitabilityMinReward = "1.1"
 # ------------------------------------------------------------------------------
 IntervalAfterWhichBatchConsolidateAnyway = "0s"
 
+ChainID = {{.zkevm_rollup_chain_id}}
+
 # ------------------------------------------------------------------------------
 # ChainID is the L2 ChainID and this is used as input to the prover
 #
@@ -1195,8 +1197,6 @@ IntervalAfterWhichBatchConsolidateAnyway = "0s"
 # value from on chain
 #
 # ------------------------------------------------------------------------------
-ChainID = {{.zkevm_rollup_chain_id}}
-
 # ------------------------------------------------------------------------------
 # ForkId is the fork id that we're currently using
 #
@@ -1234,9 +1234,10 @@ GasOffset = 150000
 # UpgradeEtrogBatchNumber is the batch number that we'll use to
 # trigger the etrog upgrade.
 # ------------------------------------------------------------------------------
-UpgradeEtrogBatchNumber = 0
+
 
 {{if .is_cdk_validium}}
+UpgradeEtrogBatchNumber = 0
 ## CDK Validium Specific Settings
 
 # ------------------------------------------------------------------------------
@@ -1263,15 +1264,17 @@ AggLayerTxTimeout = "600s"
 # ------------------------------------------------------------------------------
 # AggLayerURL is the RPC URL of the agglayer itself
 # ------------------------------------------------------------------------------
-AggLayerURL = "http://zkevm-agglayer{{.deployment_suffix}}:{{.zkevm_agglayer_port}}"
+
 {{else}}
 
+AggLayerURL = "http://zkevm-agglayer{{.deployment_suffix}}:{{.zkevm_agglayer_port}}"
 # ------------------------------------------------------------------------------
 # SenderAddress represents the address of the trusted aggregator
 # ------------------------------------------------------------------------------
-SenderAddress = "{{.zkevm_l2_aggregator_address}}"
+
 {{end}}
 
+SenderAddress = "{{.zkevm_l2_aggregator_address}}"
 # ------------------------------------------------------------------------------
 # PrivateKey is a object with the keystore and password that are used
 # for signing transactions. The keystore is a standard go-ethereum
@@ -1410,7 +1413,7 @@ MaxGRPCMessageSize = 100000000
 # URI indicates the hostname/ip and port of the hash db service of the
 # executor / prover
 # ------------------------------------------------------------------------------
-URI  = "zkevm-prover{{.deployment_suffix}}:{{.zkevm_hash_db_port}}"
+URI = "zkevm-prover{{.deployment_suffix}}:{{.zkevm_hash_db_port}}"
 
 # ==============================================================================
 #  __  __ _____ _____ ____  ___ ____ ____
@@ -1426,11 +1429,11 @@ URI  = "zkevm-prover{{.deployment_suffix}}:{{.zkevm_hash_db_port}}"
 # ------------------------------------------------------------------------------
 Host = "0.0.0.0"
 
+Port = {{.zkevm_prometheus_port}}
+
 # ------------------------------------------------------------------------------
 # Port is the port that will be used for listening metrics requests.
 # ------------------------------------------------------------------------------
-Port = {{.zkevm_prometheus_port}}
-
 # ------------------------------------------------------------------------------
 # Enabled determines if the metrics will be exposed or not
 # ------------------------------------------------------------------------------
@@ -1441,12 +1444,12 @@ Enabled = true
 # ------------------------------------------------------------------------------
 ProfilingHost = "0.0.0.0"
 
+ProfilingPort = {{.zkevm_pprof_port}}
+
 # ------------------------------------------------------------------------------
 # ProfilingPort is the port that the go debug and pprof service will
 # listen on
 # ------------------------------------------------------------------------------
-ProfilingPort = {{.zkevm_pprof_port}}
-
 # ------------------------------------------------------------------------------
 # ProfilingEnabled determines if profiling is enabled
 # ------------------------------------------------------------------------------
