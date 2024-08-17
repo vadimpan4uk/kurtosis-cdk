@@ -614,19 +614,6 @@ async function main() {
                 writableStream.write(`,\n`);
             }
         } else {
-            writableStream.write(`{\n`);
-            if (item.contractName) {
-                writableStream.write(`"contractName": "${item.contractName}",\n`);
-            }
-            if (item.accountName) {
-                writableStream.write(`"accountName": "${item.accountName}",\n`);
-            }
-            writableStream.write(`"balance": "${item.balance}",\n`);
-            writableStream.write(`"nonce": "${item.nonce}",\n`);
-            writableStream.write(`"address": "${item.address}"\n`);
-            if (item.bytecode) {
-                writableStream.write(`, "bytecode": "${item.bytecode}"\n`);
-            }
             if (isUseStorage && isUseJSONStorage) {
                 const response = await axios.get(argv.storageJSONUrl, {
                     responseType: 'stream',
@@ -645,19 +632,34 @@ async function main() {
                     }
                 }
                 console.log(' total lines: ', i);
-            } else if (item.storage) {
-                writableStream.write(`, "storage": {\n`);
-                const keys = Object.keys(item.storage);
-                for (let j = 0; j < keys.length; j++) {
-                    const key = keys[j];
-                    writableStream.write(`"${key}": "${item.storage[key]}"`);
-                    if (j !== keys.length - 1) {
-                        writableStream.write(`,\n`);
-                    }
+            } else {
+                writableStream.write(`{\n`);
+                if (item.contractName) {
+                    writableStream.write(`"contractName": "${item.contractName}",\n`);
                 }
-                writableStream.write(`}\n`);
+                if (item.accountName) {
+                    writableStream.write(`"accountName": "${item.accountName}",\n`);
+                }
+                writableStream.write(`"balance": "${item.balance}",\n`);
+                writableStream.write(`"nonce": "${item.nonce}",\n`);
+                writableStream.write(`"address": "${item.address}"\n`);
+                if (item.bytecode) {
+                    writableStream.write(`, "bytecode": "${item.bytecode}"\n`);
+                }
+                if (item.storage) {
+                    writableStream.write(`, "storage": {\n`);
+                    const keys = Object.keys(item.storage);
+                    for (let j = 0; j < keys.length; j++) {
+                        const key = keys[j];
+                        writableStream.write(`"${key}": "${item.storage[key]}"`);
+                        if (j !== keys.length - 1) {
+                            writableStream.write(`,\n`);
+                        }
+                    }
+                    writableStream.write(`}\n`);
+                }
+                writableStream.write(`}`);
             }
-            writableStream.write(`}`);
             if (i !== genesis.length - 1) {
                 writableStream.write(`,\n`);
             }
