@@ -4,10 +4,10 @@ def create_agglayer_service_config(args, config_artifact, agglayer_keystore_arti
         image=args["zkevm_agglayer_image"],
         ports={
             "agglayer": PortSpec(
-                args["zkevm_agglayer_port"], application_protocol="http"
+                args["zkevm_agglayer_port"], application_protocol="http", wait=None
             ),
             "prometheus": PortSpec(
-                args["zkevm_prometheus_port"], application_protocol="http"
+                args["zkevm_prometheus_port"], application_protocol="http", wait=None
             ),
         },
         files={
