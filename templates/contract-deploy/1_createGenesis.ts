@@ -34,7 +34,7 @@ const { once } = require('events');
 ]
  */
 
-const defaultBalance = "100000000000000000000000";
+const defaultBalance = "2000000000000000000";
 
 const argv = yargs(process.argv.slice(2))
     .options({
@@ -304,7 +304,7 @@ async function main() {
     const zkEVMDeployerInfo = await getAddressInfo(zkEVMDeployerContract.target);
     genesis.push({
         contractName: "PolygonZkEVMDeployer",
-        balance: defaultBalance,
+        balance: "0",
         nonce: zkEVMDeployerInfo.nonce.toString(),
         address: finalzkEVMDeployerAdress,
         bytecode: zkEVMDeployerInfo.bytecode,
@@ -315,7 +315,7 @@ async function main() {
     const proxyAdminInfo = await getAddressInfo(proxyAdminAddress as string);
     genesis.push({
         contractName: "ProxyAdmin",
-        balance: defaultBalance,
+        balance: "0",
         nonce: proxyAdminInfo.nonce.toString(),
         address: finalProxyAdminAddress,
         bytecode: proxyAdminInfo.bytecode,
@@ -326,7 +326,7 @@ async function main() {
     const bridgeImplementationInfo = await getAddressInfo(bridgeImplementationAddress as string);
     genesis.push({
         contractName: "PolygonZkEVMBridge implementation",
-        balance: defaultBalance,
+        balance: "0",
         nonce: bridgeImplementationInfo.nonce.toString(),
         address: finalBridgeImplAddress,
         bytecode: bridgeImplementationInfo.bytecode,
@@ -360,7 +360,7 @@ async function main() {
 
     genesis.push({
         contractName: "PolygonZkEVMGlobalExitRootL2 implementation",
-        balance: defaultBalance,
+        balance: "0",
         nonce: implGlobalExitRootL2Info.nonce.toString(),
         address: finalGlobalExitRootL2ImplAddress,
         bytecode: implGlobalExitRootL2Info.bytecode,
@@ -378,7 +378,7 @@ async function main() {
 
     genesis.push({
         contractName: "PolygonZkEVMGlobalExitRootL2 proxy",
-        balance: defaultBalance,
+        balance: "0",
         nonce: proxyGlobalExitRootL2Info.nonce.toString(),
         address: finalGlobalExitRootL2ProxyAddress,
         bytecode: proxyGlobalExitRootL2Info.bytecode,
@@ -430,7 +430,7 @@ async function main() {
 
     genesis.push({
         contractName: "PolygonZkEVMTimelock",
-        balance: defaultBalance,
+        balance: "0",
         nonce: timelockInfo.nonce.toString(),
         address: finalTimelockContractAdress,
         bytecode: timelockInfo.bytecode,
@@ -488,7 +488,7 @@ async function main() {
     // Keyless deployer
     genesis.push({
         accountName: "keyless Deployer",
-        balance: defaultBalance,
+        balance: "0",
         nonce: "1",
         address: finalKeylessDeployer,
     });
