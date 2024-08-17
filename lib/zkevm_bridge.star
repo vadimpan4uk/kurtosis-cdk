@@ -3,9 +3,9 @@ def create_bridge_service_config(args, config_artifact, claimtx_keystore_artifac
     bridge_service_config = ServiceConfig(
         image=args["zkevm_bridge_service_image"],
         ports={
-            "rpc": PortSpec(args["zkevm_bridge_rpc_port"], application_protocol="http"),
+            "rpc": PortSpec(args["zkevm_bridge_rpc_port"], application_protocol="http", wait="3h"),
             "grpc": PortSpec(
-                args["zkevm_bridge_grpc_port"], application_protocol="grpc"
+                args["zkevm_bridge_grpc_port"], application_protocol="grpc", wait="3h"
             ),
         },
         files={
