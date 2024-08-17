@@ -80,7 +80,8 @@ DEFAULT_ARGS = {
     "root": "",
     "genealogy_contract_address": "",
     "genesis_storage_url": "",
-    "zkevm_folder": ""
+    "zkevm_folder": "",
+    "genesis_storage_json_url": ""
 }
 
 
