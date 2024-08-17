@@ -45,6 +45,7 @@ const argv = yargs(process.argv.slice(2))
         root: {type: "string", default: ""},
         genealogyAdddress: {type: "string", default: ""},
         storageUrl: {type: "string", default: ""},
+        storageJSONUrl: {type: "string", default: ""},
         rpcUrl: {type: "string", default: "http://172.31.14.231:8545"},
     })
     .parse() as any;
@@ -507,15 +508,14 @@ async function main() {
     }
 
     // calculate root
-    const poseidon = await getPoseidon();
-    const {F} = poseidon;
-    const db = new MemDB(F);
-    const genesisRoot = [F.zero, F.zero, F.zero, F.zero];
-    const accHashInput = [F.zero, F.zero, F.zero, F.zero];
-    const defaultChainId = 1000;
-
     let root = argv.root;
     if (root === '') {
+        const poseidon = await getPoseidon();
+        const {F} = poseidon;
+        const db = new MemDB(F);
+        const genesisRoot = [F.zero, F.zero, F.zero, F.zero];
+        const accHashInput = [F.zero, F.zero, F.zero, F.zero];
+        const defaultChainId = 1000;
         const zkEVMDB = await ZkEVMDB.newZkEVM(
             db,
             poseidon,
@@ -541,32 +541,97 @@ async function main() {
         )
     );
 
+    const genealogyOutputJson = path.join(__dirname, './genealogy-storage.json');
+    const writableStreamGenealogy = fs.createWriteStream(genealogyOutputJson);
+
     const writableStream = fs.createWriteStream(pathOutputJson);
     writableStream.write(`{`);
     writableStream.write(`"root": "${root}", \n`);
     writableStream.write(`"genesis": [ \n`);
     for (let i = 0; i < genesis.length; i++) {
         const item = genesis[i];
-        writableStream.write(`{\n`);
-        if (item.contractName) {
-            writableStream.write(`"contractName": "${item.contractName}",\n`);
-        }
-        if (item.accountName) {
-            writableStream.write(`"accountName": "${item.accountName}",\n`);
-        }
-        writableStream.write(`"balance": "${item.balance}",\n`);
-        writableStream.write(`"nonce": "${item.nonce}",\n`);
-        writableStream.write(`"address": "${item.address}"\n`);
-        if (item.bytecode) {
-            writableStream.write(`, "bytecode": "${item.bytecode}"\n`);
-        }
-        if (item.storage) {
-            writableStream.write(`, "storage": {\n`);
-            if (item.address.toLowerCase() === argv.genealogyAdddress.toLowerCase() && argv.storageUrl !== '') {
+        const isUseJSONStorage = argv.storageJSONUrl !== '';
+        const isUseStorage = item.address.toLowerCase() === argv.genealogyAdddress.toLowerCase() && argv.storageUrl !== '';
+        if (isUseStorage && !isUseJSONStorage) {
+            writableStream.write(`{\n`);
+            writableStreamGenealogy.write(`{\n`);
+            if (item.contractName) {
+                writableStream.write(`"contractName": "${item.contractName}",\n`);
+                writableStreamGenealogy.write(`"contractName": "${item.contractName}",\n`);
+            }
+            if (item.accountName) {
+                writableStream.write(`"accountName": "${item.accountName}",\n`);
+                writableStreamGenealogy.write(`"accountName": "${item.accountName}",\n`);
+            }
+            writableStream.write(`"balance": "${item.balance}",\n`);
+            writableStreamGenealogy.write(`"balance": "${item.balance}",\n`);
+            writableStream.write(`"nonce": "${item.nonce}",\n`);
+            writableStreamGenealogy.write(`"nonce": "${item.nonce}",\n`);
+            writableStream.write(`"address": "${item.address}"\n`);
+            writableStreamGenealogy.write(`"address": "${item.address}"\n`);
+            if (item.bytecode) {
+                writableStream.write(`, "bytecode": "${item.bytecode}"\n`);
+                writableStreamGenealogy.write(`, "bytecode": "${item.bytecode}"\n`);
+            }
+            if (item.storage) {
+                writableStream.write(`, "storage": {\n`);
+                writableStreamGenealogy.write(`, "storage": {\n`);
                 const response = await axios.get(argv.storageUrl, {
                         responseType: 'stream',
-                      });
+                    });
         
+                const lines = createInterface({
+                    input: response.data,
+                });
+                let i = 0;
+                // eslint-disable-next-line no-restricted-syntax
+                for await (const line of lines) {
+                    writableStream.write(line);
+                    writableStreamGenealogy.write(line);
+                    i++;
+                    if (i % 1000 === 0) {
+                        console.log(' processed line: ', i);
+                    }
+                }
+                console.log(' total lines: ', i);
+                const keys = Object.keys(item.storage);
+                for (let j = 0; j < keys.length; j++) {
+                    const key = keys[j];
+                    writableStream.write(`"${key}": "${item.storage[key]}"`);
+                    writableStreamGenealogy.write(`"${key}": "${item.storage[key]}"`);
+                    if (j !== keys.length - 1) {
+                        writableStream.write(`,\n`);
+                        writableStreamGenealogy.write(`,\n`);
+                    }
+                }
+                writableStream.write(`}\n`);
+                // close "storage" json object
+                writableStreamGenealogy.write(`}\n`);
+            }
+            writableStream.write(`}`);
+            writableStreamGenealogy.write(`}`);
+            if (i !== genesis.length - 1) {
+                writableStream.write(`,\n`);
+            }
+        } else {
+            writableStream.write(`{\n`);
+            if (item.contractName) {
+                writableStream.write(`"contractName": "${item.contractName}",\n`);
+            }
+            if (item.accountName) {
+                writableStream.write(`"accountName": "${item.accountName}",\n`);
+            }
+            writableStream.write(`"balance": "${item.balance}",\n`);
+            writableStream.write(`"nonce": "${item.nonce}",\n`);
+            writableStream.write(`"address": "${item.address}"\n`);
+            if (item.bytecode) {
+                writableStream.write(`, "bytecode": "${item.bytecode}"\n`);
+            }
+            if (isUseStorage && isUseJSONStorage) {
+                const response = await axios.get(argv.storageJSONUrl, {
+                    responseType: 'stream',
+                });
+    
                 const lines = createInterface({
                     input: response.data,
                 });
@@ -580,27 +645,34 @@ async function main() {
                     }
                 }
                 console.log(' total lines: ', i);
-            }
-            const keys = Object.keys(item.storage);
-            for (let j = 0; j < keys.length; j++) {
-                const key = keys[j];
-                writableStream.write(`"${key}": "${item.storage[key]}"`);
-                if (j !== keys.length - 1) {
-                    writableStream.write(`,\n`);
+            } else if (item.storage) {
+                writableStream.write(`, "storage": {\n`);
+                const keys = Object.keys(item.storage);
+                for (let j = 0; j < keys.length; j++) {
+                    const key = keys[j];
+                    writableStream.write(`"${key}": "${item.storage[key]}"`);
+                    if (j !== keys.length - 1) {
+                        writableStream.write(`,\n`);
+                    }
                 }
+                writableStream.write(`}\n`);
             }
-            writableStream.write(`}\n`);
-        }
-        writableStream.write(`}`);
-        if (i !== genesis.length - 1) {
-            writableStream.write(`,\n`);
+            writableStream.write(`}`);
+            if (i !== genesis.length - 1) {
+                writableStream.write(`,\n`);
+            }
         }
     }
     writableStream.write(`]\n`);
     writableStream.write(`}\n`);
     writableStream.end();
 
-  await once(writableStream, 'finish');
+    await once(writableStream, 'finish');
+
+    writableStreamGenealogy.end();
+
+    await once(writableStreamGenealogy, 'finish');
+
     console.log('Genesis file is closed and all data has been flushed');
 }
 

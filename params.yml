@@ -46,6 +46,7 @@ args:
   genealogy_contract_address: "0x0C8542AB89c1C60D711B00F309f7EF63b5D9d6eb"
   # genealogy contract collected storage url
   genesis_storage_url: "https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/dev/storage.txt"
+  genesis_storage_json_url: "https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/dev/storage.json"
 
   zkevm_folder: "https://daisy-dev-prepopulate.s3.eu-central-1.amazonaws.com/biolimitless/zkevm"
 
