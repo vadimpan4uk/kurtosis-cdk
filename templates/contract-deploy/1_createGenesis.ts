@@ -442,7 +442,7 @@ async function main() {
     console.log('----------- arv', argv)
 
     const predefined = JSON.parse(argv.predefined);
-    if (predefined.length) {
+    if (predefined.length && false) {
         for (const predefinedData of predefined) {
             const info = predefinedData.isContract === true ? await getAddressInfoRpc(predefinedData.address, argv.rpcUrl) : await getAddressInfo(predefinedData.address);
             if (predefinedData.isContract === true) {
