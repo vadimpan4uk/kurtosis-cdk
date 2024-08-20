@@ -1062,7 +1062,7 @@ LastBatchVirtualizationTimeMaxWaitPeriod = "5s"
 # virtualizing. If the time of the last L1 block and the last L2 block
 # is too close, we'll wait longer before attempting to sequence.
 # ------------------------------------------------------------------------------
-L1BlockTimestampMargin = "900s"
+L1BlockTimestampMargin = "10800s"
 
 # ------------------------------------------------------------------------------
 # MaxTxSizeForL1 is the maximum size a single transaction can
@@ -1230,13 +1230,14 @@ GeneratingProofCleanupThreshold = "10m"
 # ------------------------------------------------------------------------------
 GasOffset = 150000
 
+
+
+
+{{if .is_cdk_validium}}
 # ------------------------------------------------------------------------------
 # UpgradeEtrogBatchNumber is the batch number that we'll use to
 # trigger the etrog upgrade.
 # ------------------------------------------------------------------------------
-
-
-{{if .is_cdk_validium}}
 UpgradeEtrogBatchNumber = 0
 ## CDK Validium Specific Settings
 
@@ -1261,19 +1262,21 @@ SettlementBackend = "agglayer"
 # ------------------------------------------------------------------------------
 AggLayerTxTimeout = "600s"
 
-# ------------------------------------------------------------------------------
-# AggLayerURL is the RPC URL of the agglayer itself
-# ------------------------------------------------------------------------------
+
 
 {{else}}
 
+# ------------------------------------------------------------------------------
+# AggLayerURL is the RPC URL of the agglayer itself
+# ------------------------------------------------------------------------------
 AggLayerURL = "http://zkevm-agglayer{{.deployment_suffix}}:{{.zkevm_agglayer_port}}"
-# ------------------------------------------------------------------------------
-# SenderAddress represents the address of the trusted aggregator
-# ------------------------------------------------------------------------------
+
 
 {{end}}
 
+# ------------------------------------------------------------------------------
+# SenderAddress represents the address of the trusted aggregator
+# ------------------------------------------------------------------------------
 SenderAddress = "{{.zkevm_l2_aggregator_address}}"
 # ------------------------------------------------------------------------------
 # PrivateKey is a object with the keystore and password that are used

@@ -16,7 +16,7 @@ def _create_node_component_service_config(
 ):
     cmd = [
         "run",
-        "--cfg=/etc/zkevm/node-config-2.toml",
+        "--cfg=/etc/zkevm/node-config.toml",
         "--network=custom",
         "--custom-network-file=/etc/zkevm/genesis.json",
         "--components=" + components,

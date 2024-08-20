@@ -37,10 +37,10 @@ def run(plan, args):
         )
 
     # Create the zkevm node config.
-    node_config_template = read_file(src="./templates/trusted-node/node-config-2.toml")
+    node_config_template = read_file(src="./templates/trusted-node/node-config.toml")
     node_config_artifact = plan.render_templates(
         config={
-            "node-config-2.toml": struct(
+            "node-config.toml": struct(
                 template=node_config_template,
                 data=args
                 | {
