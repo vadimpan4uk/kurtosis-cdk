@@ -6,8 +6,11 @@ WORKDIR /opt/zkevm-bridge-ui
 # WARNING (DL3018): Pin versions in apk add.
 # hadolint ignore=DL3018
 RUN apk add --no-cache git patch \
-  && rm -rf /var/cache/apk/* \
-  && git clone --branch ${ZKEVM_BRIDGE_UI_TAG} https://github.com/0xPolygonHermez/zkevm-bridge-ui .
+  && rm -rf /var/cache/apk/* 
+
+# repo should be copied before
+# copy the zkevm-bridge-ui repository and patch it
+COPY biolimitless-bridge-web .
 
 # STEP 2: Apply patches.
 COPY deploy.sh.diff env.ts.diff ./
